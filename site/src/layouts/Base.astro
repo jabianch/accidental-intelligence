@@ -1,0 +1,80 @@
+---
+const { title, description, bare = false } = Astro.props
+import copy from '../copy.json'
+// Fonts are self-hosted: a visitor's browser talks to this domain and no other.
+import '@fontsource/ibm-plex-sans/latin-400.css'
+import '@fontsource/ibm-plex-sans/latin-500.css'
+import '@fontsource/ibm-plex-sans/latin-600.css'
+import '@fontsource/ibm-plex-mono/latin-400.css'
+import '@fontsource/ibm-plex-mono/latin-500.css'
+import '@fontsource/anton/latin-400.css'
+// the copy rides along for layout.js and mascots.js; \u003c keeps a stray </script> in the copy from closing the tag
+const copyJson = JSON.stringify(copy).replace(/</g, '\\u003c')
+const marquee = Array(24).fill(`///////// ${copy.lab.toUpperCase()} · ${copy.drop} `).join('')
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<!-- the link card when the page is shared -->
+<meta property="og:type" content="website">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)}>
+<meta property="og:image" content={new URL('/og.png', Astro.site)}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="628">
+<meta property="og:image:alt" content="Apocalypse Mascots: the title, a tentacle, and Yoggy in a terminal.">
+<meta name="twitter:card" content="summary_large_image">
+<style is:global>
+:root{
+  --bg:#f0f1f2;--panel:#e5e5e5;--panel2:#dcdee1;--line:#c2c2c2;--ink:#1b1b1b;--ink2:#4d4d4d;--ink3:#767676;--steel:#a1a7af;
+  --burst:#ffd400;--burst-shade:#c99f00;--red:#e4002b;--term:#0d0b14;--term-fg:#e9e4f2;--term-mute:#8f88a3;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;--loud:"Anton",Impact,"Arial Narrow",sans-serif
+}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans)}
+.marquee{overflow:hidden;white-space:nowrap;border-bottom:1px solid var(--line);background:var(--panel);font:12px/2.2 var(--mono);color:var(--ink3);letter-spacing:.04em}
+.marquee span{display:inline-block;animation:slide 60s linear infinite}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;padding:22px 0 18px;border-bottom:1px solid var(--line)}
+.wordmark{font:500 13px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase}
+.wordmark a{color:inherit;text-decoration:none}
+.wordmark small{display:block;margin-top:6px;letter-spacing:.04em;text-transform:none;color:var(--ink3);font-size:12px}
+header nav a{color:var(--ink2);text-decoration:none;font:400 13px var(--mono);margin-left:20px}
+h2.lab{font:500 12px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin:0 0 20px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.btn{font:500 15px var(--sans);background:var(--ink);color:#fff;border:0;border-radius:2px;padding:12px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.note{font:12px/1.5 var(--mono);color:var(--ink3)}
+footer{padding:20px 0 60px;border-top:1px solid var(--line);font:12px/1.6 var(--mono);color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (max-width:640px){
+  header{flex-direction:column;align-items:flex-start;gap:14px}
+  header nav{display:flex;flex-wrap:wrap;gap:6px 18px}
+  header nav a{margin:0;white-space:nowrap}
+  .toast{left:16px;right:16px}
+}
+.toast{position:fixed;right:16px;bottom:16px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--burst);padding:10px 14px;border-radius:2px;font:14px var(--sans);opacity:0;transform:translateY(8px);transition:all .25s;z-index:45}
+.toast.on{opacity:1;transform:none}
+</style>
+<script type="application/json" id="copy-data" set:html={copyJson}></script>
+<slot name="head" />
+</head>
+<body>
+{!bare && <div class="marquee" aria-hidden="true"><span>{marquee}</span></div>}
+<div class="wrap">
+{!bare && <header>
+  <div class="wordmark"><a href="/"><span data-k="lab">{copy.lab}</span></a><small data-k="labSub">{copy.labSub}</small></div>
+  <nav><slot name="nav" /></nav>
+</header>}
+<slot />
+</div>
+<div class="toast" id="toast"></div>
+<script is:inline src="/layout.js"></script>
+{import.meta.env.DEV && <script is:inline src="/editor.js"></script>}
+</body>
+</html>

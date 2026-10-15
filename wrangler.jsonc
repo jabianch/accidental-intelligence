@@ -1,0 +1,7 @@
+// Cloudflare Workers static-assets deploy from the repo root (Workers Builds root directory `/`).
+// Build command `npm run build`, deploy command `npx wrangler deploy`. The site itself lives in site/.
+{
+  "name": "accidental-intelligence",
+  "compatibility_date": "2026-10-10",
+  "assets": { "directory": "./site/dist", "not_found_handling": "404-page" }
+}

@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro'
+import copy from '../copy.json'
+import '@fontsource/instrument-serif/latin-400.css'
+const h = copy.home
+const usd = (n) => '$' + Math.round(n).toLocaleString('en-US')
+---
+<Base title={copy.lab} description={h.line} bare={true}>
+  <style>
+    .home{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 0 110px;box-sizing:border-box}
+    .top{position:absolute;left:0;right:0;top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;align-items:flex-start;gap:12px 28px;font:12px/1.6 var(--mono);color:var(--ink3);text-align:left}
+    .val{display:grid;grid-template-columns:auto auto;column-gap:14px;justify-content:start}
+    .val b,.val em{font-weight:400;font-style:normal;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .val b{color:var(--ink)}
+    .val em{color:#1a9a3e}
+    .status{color:var(--ink2);text-decoration:none;padding:3px 8px;margin:-3px -8px;border-radius:2px;transition:background .15s,color .15s}
+    .status::after{content:"↗";display:inline-block;width:0;overflow:hidden;opacity:0;vertical-align:top;transition:width .15s,opacity .15s}
+    .status:hover,.status:focus-visible{background:var(--ink);color:#fff;outline:0}
+    .status:hover::after,.status:focus-visible::after{width:1.3em;opacity:1;text-align:right}
+    .status i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#1fbf4a;margin-right:8px;vertical-align:1px;box-shadow:0 0 0 0 rgba(31,191,74,.5);animation:pulse 2s infinite}
+    @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(31,191,74,0)}100%{box-shadow:0 0 0 0 rgba(31,191,74,0)}}
+    .logo{font:500 clamp(1.6rem,4.2vw,2.6rem)/1 var(--mono);letter-spacing:.3em;text-transform:uppercase;margin:0}
+    .logo > span{padding-left:.3em}
+    .logo small{display:block;margin-top:18px;letter-spacing:.08em;text-transform:none;color:var(--ink3);font:400 14px/1 var(--mono)}
+    .line{font:400 clamp(1.3rem,2.4vw,1.65rem)/1.38 "Instrument Serif",Georgia,serif;letter-spacing:.005em;margin:56px 0 52px;max-width:600px;color:var(--ink);text-align:justify;text-align-last:center;hyphens:auto;-webkit-hyphens:auto}
+    .index{width:min(520px,100%);text-align:left;font:500 13px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+    .index h2{font:inherit;color:var(--ink3);margin:0 0 12px;letter-spacing:.24em}
+    .index a,.index .redacted{display:grid;margin:0;font:inherit;grid-template-columns:5.5em 1fr 1.5em;align-items:center;padding:14px 10px;border-top:1px solid var(--ink);color:var(--ink);text-decoration:none}
+    .index > :last-child{border-bottom:1px solid var(--ink)}
+    .index a::after{content:"↗";opacity:0;text-align:right}
+    .index a:hover,.index a:focus-visible{background:#5b2d8a;border-color:#5b2d8a;color:#fff;outline:0}
+    .index a:hover::after,.index a:focus-visible::after{opacity:1}
+    .index .redacted{color:var(--steel);cursor:not-allowed;letter-spacing:.06em;border-top-color:var(--line)}
+    .index .redacted .n{letter-spacing:.14em}
+    .legal{position:absolute;left:0;right:0;bottom:28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;font:12px/1.6 var(--mono);color:var(--ink3);text-align:left}
+    .clocks{display:flex;flex-wrap:wrap;gap:0 16px}
+    .clocks b{font-weight:400;color:var(--ink2);font-variant-numeric:tabular-nums}
+    .award{position:fixed;right:0;top:50%;translate:0 -50%;writing-mode:vertical-rl;rotate:180deg;background:var(--ink);color:#fff;font:500 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;padding:16px 9px;z-index:5}
+    .loader{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font:12px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink3);transition:opacity .35s}
+    .loader b{font:400 clamp(4rem,14vw,9rem)/1 var(--loud);color:var(--ink);letter-spacing:0;font-variant-numeric:tabular-nums}
+    .loader.gone{opacity:0;pointer-events:none}
+    /* desktop: the corner furniture sits near the window's corners, not the column's */
+    @media (min-width:1100px){.top,.legal{left:calc(50% - 50vw + 40px);right:calc(50% - 50vw + 40px)}.top{top:28px}.legal{bottom:28px}}
+    @media (max-width:640px){.award{display:none}.home{padding:150px 0 120px}}
+    @media (prefers-reduced-motion:reduce){.status i{animation:none}}
+  </style>
+  <section data-section="home" class="home" lang="en">
+    <div class="top">
+      <div class="val">
+        <span data-k="home.valuation">{h.valuation}</span><b id="val">$000,000,000,000</b>
+        <span data-k="home.since">{h.since}</span><em id="gain"></em>
+      </div>
+      <a class="status" href={h.investHref} rel="noopener"><i aria-hidden="true"></i><span data-k="home.status">{h.status}</span></a>
+    </div>
+    <h1 class="logo"><span data-k="lab">{copy.lab}</span><small data-k="home.tagline">{h.tagline}</small></h1>
+    <p class="line" data-k="home.line">{h.line}</p>
+    <nav class="index" aria-label="Products">
+      <h2 data-k="home.cta">{h.cta}</h2>
+      {h.index.map((d) => d.href
+        ? <a href={d.href}><span class="n">{d.n}</span><span>{d.name}</span></a>
+        : <div class="redacted" aria-label="Classified"><span class="n">{d.n}</span><span>{'?'.repeat(d.redact)}</span></div>)}
+    </nav>
+    <div class="legal">
+      <span data-k="home.legal">{h.legal}</span>
+      <div class="clocks" aria-hidden="true">
+        {h.clocks.map(([label, tz], i) => <span><span data-k={`home.clocks.${i}.0`}>{label}</span> <b data-tz={tz}>{tz ? '--:--' : '??:??'}</b></span>)}
+      </div>
+    </div>
+  </section>
+  <div class="award" aria-hidden="true" data-k="home.award">{h.award}</div>
+  <script is:inline src="/home.js" slot="head" defer></script>
+</Base>

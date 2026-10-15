@@ -1,0 +1,7 @@
+{
+  "name": "accidental-intelligence",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix site ci && npm --prefix site run build"
+  }
+}

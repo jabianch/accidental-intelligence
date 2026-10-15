@@ -1,0 +1,12 @@
+{
+  "name": "accidental-intelligence",
+  "description": "Accidental Intelligence. Small objects about what we are actually talking to. An art project by Joseph Bianchi, Amsterdam.",
+  "owner": { "name": "Accidental Intelligence (Joseph Bianchi)", "url": "https://accidentalintelligence.org" },
+  "plugins": [
+    {
+      "name": "apocalypse-mascots",
+      "source": "./plugins/apocalypse-mascots",
+      "description": "Code with AI as it really is. A mascot above your prompt that grows with every capability you hand the agent."
+    }
+  ]
+}

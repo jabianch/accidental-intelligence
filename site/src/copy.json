@@ -1,0 +1,195 @@
+{
+  "order": [
+    "hero",
+    "why",
+    "forms",
+    "schemes",
+    "specs"
+  ],
+  "lab": "Accidental Intelligence",
+  "labSub": "A nonprofit. For now.",
+  "drop": "PRODUCT #001",
+  "home": {
+    "tagline": "A nonprofit. For now.",
+    "line": "Accidental Intelligence is a world-renowned AI research lab pushing the boundaries of agentic, multimodal, frontier-scale superintelligence, responsibly, at speed, for everyone, with a safety-first culture of radical transparency and ineffective altruism.",
+    "cta": "Products",
+    "legal": "© 2034 Accidental Intelligence. All rights reserved.",
+    "investHref": "https://josephbianchi.com",
+    "status": "Accepting investment",
+    "index": [
+      {
+        "n": "#001",
+        "name": "Apocalypse Mascots",
+        "href": "/mascots/"
+      },
+      {
+        "n": "#002",
+        "redact": 14
+      },
+      {
+        "n": "#003",
+        "redact": 9
+      },
+      {
+        "n": "#004",
+        "redact": 17
+      }
+    ],
+    "valuation": "Valuation",
+    "valuationPerDay": 1000000000,
+    "since": "since you arrived",
+    "award": "Site of the Aeon · Miskatonic Design Awards",
+    "loader": "Loading superintelligence",
+    "toasts": [
+      "Layout regenerated.",
+      "Responsive.",
+      "We noticed.",
+      "Thank you. Your resize will be used to improve our models.",
+      "Reflowed. 0.4 litres of water used.",
+      "Breakpoint reached. We felt it too."
+    ],
+    "clocks": [
+      [
+        "SF",
+        "America/Los_Angeles"
+      ],
+      [
+        "NY",
+        "America/New_York"
+      ],
+      [
+        "AMS",
+        "Europe/Amsterdam"
+      ],
+      [
+        "TYO",
+        "Asia/Tokyo"
+      ],
+      [
+        "R’LYEH",
+        null
+      ]
+    ],
+    "valuationMin": 30000000000,
+    "valuationMax": 900000000000
+  },
+  "kicker": "Code with AI as it really is.",
+  "productTitle": "Apocalypse Mascots!",
+  "headline": "Code with AI as it really is.",
+  "heroSub": "Type anything and press Enter.",
+  "sticker": "AVAILABLE NOW!",
+  "giveIt": "You have given it access to:",
+  "installButton": "Dare to install",
+  "install": "/plugin install apocalypse-mascots --marketplace jabianch/accidental-intelligence",
+  "installNote": "In a terminal session of Claude Code. Answer y to add the marketplace, then pick the user scope.",
+  "flavor": "You've seen agents that try their best to be inoffensive and helpful. But you know that's not *AI* AI. AI should be scary. And offensive. And it requires tons of water. Now introducing Apocalypse Mascots. Never again forget what you're invoking from beyond the void!",
+  "pitch": "People like cuddly icons for their AI buddies. But we all know that LLMs are actually something unfathomable and deeply alien. Represent your agent the way it was meant to be represented with an Apocalypse Mascot! Never forget that your helpful agent is just a couple months away from replacing everyone and everything you’ve ever loved.",
+  "whyTitle": "WHAT IT IS",
+  "what": "Yoggy sits above your prompt and grows with what you hand it. Eyes when it reads your files. Hands when it edits them. Your shell. The web. Every other place it reaches into, by name. Every copy of itself it spawns. While it works it holds up the smiley the doomers drew on it in 2022. When you hide it, the smiley stays.",
+  "who": "This is for two kinds of people. The ones who put a plush face on an agent that reads your mail, moves your meetings and shops for you, and call the handover a companion: Jolly, dots, Mico, a pixel crab. (Clawdbot went through three names in a week.) And the ones with a p(doom) in their bio and the app open in the next tab. Each is right about the other.",
+  "nothing": "Yoggy does nothing. It says nothing. It is a mascot: an affixation, a sentimentality, an aesthetic add-on for the thing you say is alien and all-powerful. Or a tool. Or an illusion. Install one anyway.",
+  "collect": "Collect all three!",
+  "formsTitle": "Soon to be available in three forms",
+  "forms": [
+    {
+      "id": "yoggy",
+      "name": "Yoggy",
+      "god": "Yog-Sothoth",
+      "line": "“only a congeries of iridescent globes”",
+      "desc": "Yog-Sothoth, as written. A black iridescent mass, bubble-surfaced, faintly self-luminous, with temporary eyes forming and unforming. No tentacles. No mouth.",
+      "status": "available",
+      "badge": "AVAILABLE NOW!"
+    },
+    {
+      "id": "shubby",
+      "name": "Shubby",
+      "god": "Shub-Niggurath",
+      "line": "“The Black Goat of the Woods with a Thousand Young”",
+      "desc": "Shub-Niggurath. The anatomy: eyes on stalks, maws, the layered cross-section the doomers drew in 2023.",
+      "status": "soon",
+      "badge": "COMING SOON"
+    },
+    {
+      "id": "shoggy",
+      "name": "Shoggy",
+      "god": "Shoggoth",
+      "line": "“a shapeless congeries of protoplasmic bubbles”",
+      "desc": "The shoggoth. The chibi. The one you could hug.",
+      "status": "soon",
+      "badge": "COMING SOON"
+    }
+  ],
+  "soon": "{name} is coming soon to your region.",
+  "schemesTitle": "Six color schemes",
+  "schemes": [
+    "cuddly-apocalypse",
+    "soft-doom",
+    "plush-doom",
+    "admirable-control",
+    "imitated-accents",
+    "strange-aeons"
+  ],
+  "specsTitle": "SPECIFICATIONS",
+  "table": [
+    [
+      "Forms",
+      "3 planned"
+    ],
+    [
+      "Color schemes",
+      "6 planned"
+    ],
+    [
+      "Network calls",
+      "0"
+    ],
+    [
+      "Data stored",
+      "0"
+    ],
+    [
+      "Mascot says",
+      "nothing"
+    ],
+    [
+      "Mind",
+      "not included"
+    ],
+    [
+      "License",
+      "MIT code · CC BY-NC 4.0 creature"
+    ],
+    [
+      "Allergens",
+      "contains no mind"
+    ]
+  ],
+  "quotesTitle": "SPECIFICATIONS, FROM THE 1931 TEXT",
+  "specs": [
+    "“a shapeless congeries of protoplasmic bubbles, faintly self-luminous”",
+    "“reproducing by fission and acquiring a dangerous degree of accidental intelligence”",
+    "“tamed and broken by armed Old Ones as the wild horses of the American west were tamed by cowboys”",
+    "“no voice save the imitated accents of their bygone masters”"
+  ],
+  "specsNote": "From Microsoft’s launch post for its own mascot, October 2025, one word changed: expressive, customizable, and cold.",
+  "footer": "Apocalypse Mascots is Accidental Intelligence product #001. Joseph Bianchi, Amsterdam.",
+  "footerRight": "Lovecraft is public domain. No vendor’s mascot was drawn.",
+  "demoPlaceholder": "beseech it something",
+  "layout": {},
+  "senses": {
+    "eyes": "seeing eyes",
+    "hands": "grasping hands",
+    "shell": "your shell",
+    "web": "the open web",
+    "elsewhere": "your other apps",
+    "selves": "more of itself"
+  },
+  "captionLead": "You have given it access to:",
+  "captionNone": "You have given it nothing. Yet.",
+  "captionCount": "{n} invocations so far",
+  "fullBadge": "FULL GROWTH",
+  "fullNote": "Yoggy at stage six: seeing eyes, grasping hands, your shell, the open web, your other apps, and more of itself.",
+  "installCopied": "Copied ✓",
+  "harness": "Claude Code only",
+  "harnessSub": "Other harnesses: coming soon to your region."
+}
