@@ -45,6 +45,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
     .give .lead{color:var(--ink3)}
     .give button{font:12px var(--mono);background:transparent;border:1px solid var(--line);border-radius:2px;padding:4px 8px;cursor:pointer;color:var(--ink2)}
     .installrow{max-width:880px;margin:44px auto 0;text-align:left}
+    .srclink{display:inline-block;margin-top:10px;font:13px/1.5 var(--mono);color:var(--ink);text-decoration:underline;text-underline-offset:3px}.srclink:hover{color:var(--ink2)}
     pre.install{margin:0 0 14px;background:#fff;border:1px solid var(--line);border-radius:3px;padding:14px 16px;font:14px/1.5 var(--mono);overflow:auto;white-space:pre-wrap;word-break:break-all;display:flex;gap:12px;align-items:center;box-shadow:0 2px 0 var(--line),0 8px 20px rgba(27,27,27,.08);transition:transform .2s,box-shadow .2s,border-color .2s;cursor:pointer}
     pre.install:hover{transform:translateY(-2px);border-color:var(--ink);box-shadow:0 4px 0 var(--ink),0 16px 28px rgba(27,27,27,.14)}
     pre.install:active{transform:translateY(1px);box-shadow:0 1px 0 var(--ink)}
@@ -60,7 +61,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
     @media (max-width:640px){
       section{padding:64px 0 24px}
       .hero{padding:32px 0 56px}
-      .kicker{margin-bottom:32px;font-size:11px;letter-spacing:.16em}
+      .kicker{margin-bottom:calc(min(128px,25vw)*.36 + 16px);font-size:11px;letter-spacing:.16em} /* the eyes overhang the title by .36 of their width; clear them */
       .term{font-size:12.5px;padding:16px 14px 12px;border-radius:8px}
       .term .bar{margin-bottom:10px}
       .give{justify-content:flex-start;gap:6px 14px;margin-top:36px}
@@ -149,6 +150,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
       <div class="harness"><span class="prompt" aria-hidden="true">&gt;_</span><span data-k="harness">{copy.harness}</span><em data-k="harnessSub">{copy.harnessSub}</em></div>
       <pre class="install"><code id="install-line" data-k="install">{copy.install}</code><button id="copy"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-k="installButton">{copy.installButton}</span></button></pre>
       <div class="note" data-k="installNote">{copy.installNote}</div>
+      <a class="srclink" href="https://github.com/jabianch/accidental-intelligence" data-k="sourceLink">{copy.sourceLink}</a>
     </div>
     <p class="flavor" data-k="flavor" set:html={inline(copy.flavor)}></p>
   </section>)

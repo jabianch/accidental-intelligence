@@ -82,6 +82,7 @@
   "installButton": "Dare to install",
   "install": "/plugin install apocalypse-mascots --marketplace jabianch/accidental-intelligence",
   "installNote": "In a terminal session of Claude Code. Answer y to add the marketplace, then pick the user scope.",
+  "sourceLink": "Read the source on GitHub",
   "flavor": "You've seen agents that try their best to be inoffensive and helpful. But you know that's not *AI* AI. AI should be scary. And offensive. And it requires tons of water. Now introducing Apocalypse Mascots. Never again forget what you're invoking from beyond the void!",
   "pitch": "People like cuddly icons for their AI buddies. But we all know that LLMs are actually something unfathomable and deeply alien. Represent your agent the way it was meant to be represented with an Apocalypse Mascot! Never forget that your helpful agent is just a couple months away from replacing everyone and everything you’ve ever loved.",
   "whyTitle": "WHAT IT IS",
