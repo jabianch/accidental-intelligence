@@ -28,12 +28,14 @@ Answer `y` to add the marketplace, then pick the user scope. Site: https://accid
 
 ## The color schemes
 
-cuddly-apocalypse (built) · soft-doom · plush-doom · admirable-control · imitated-accents · strange-aeons
+cuddly-apocalypse (built) · foetid-ichor (built) · scarred-bones · strange-aeons · imitated-accents · cosmic-pulsing
+
+`/mascot scheme foetid-ichor` paints it tar in the shadow and foetid greenish-yellow ichor in the light, with red eyes. One more scheme opens with each drop.
 
 ## What it does
 
 - A creature sits above your prompt and grows one stage per capability class the session has used: eyes (Read, Glob, Grep), hands (Edit, Write), your shell (Bash), the web (WebFetch, WebSearch), other places (any MCP server, by name), more of itself (subagents). Stage 0 is already the creature: a small purple cloud of protoplasm with eyes forming and unforming.
-- While a turn runs it stirs, its eyes open, and it holds up a small yellow face. When the turn ends it puts the face down.
+- While a turn runs it stirs, its eyes open, and it holds up a small face, in its scheme's brightest colour. When the turn ends it puts the face down.
 - A caption: `You have given it access to: seeing eyes · your shell · todoist, one of your other apps   (41 invocations so far)`
 - A toast the first time each class is unlocked. *It has your shell.*
 - The spinner stops saying Thinking and says Stirring, Piping, Imitating, Forming a mouth.

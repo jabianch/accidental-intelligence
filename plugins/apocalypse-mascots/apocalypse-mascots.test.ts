@@ -7,12 +7,39 @@ const BAND = {
 } as const
 const WORKING = { ...BAND, props: { ...BAND.props, isWorking: true } } as const
 
+// a Raster's cells: base64 of little-endian u32 triplets [codePoint, foreground, background]
+const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+function cellsOf(el: RenderElement | undefined): { ch: string; fg: number }[] {
+  const b64 = String((el as Extract<RenderElement, { type: 'Raster' }> | undefined)?.props.cells ?? '').replace(/=+$/, '')
+  const bytes: number[] = []
+  for (let i = 0; i < b64.length; i += 4) {
+    const n = [0, 1, 2, 3].map(k => B64.indexOf(b64[i + k] ?? 'A'))
+    const v = ((n[0] ?? 0) << 18) | ((n[1] ?? 0) << 12) | ((n[2] ?? 0) << 6) | (n[3] ?? 0)
+    bytes.push((v >> 16) & 255, (v >> 8) & 255, v & 255)
+  }
+  const u32 = (i: number) => ((bytes[i] ?? 0) | ((bytes[i + 1] ?? 0) << 8) | ((bytes[i + 2] ?? 0) << 16) | ((bytes[i + 3] ?? 0) << 24)) >>> 0
+  const out: { ch: string; fg: number }[] = []
+  for (let i = 0; i + 12 <= Math.floor((b64.length * 3) / 4); i += 12) out.push({ ch: String.fromCodePoint(u32(i)), fg: u32(i + 4) })
+  return out
+}
+const BRAILLE = /[\u2801-\u28ff]/
+const EYES = /[◉•]/
+const rgbOf = (fg: number) => [(fg >> 16) & 255, (fg >> 8) & 255, fg & 255] as const
+const luminance = (fg: number) => {
+  const [r, g, b] = rgbOf(fg).map(v => { const c = v / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 })
+  return 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0)
+}
+
 test('before anything is granted, it is already a small cloud, not two dots', async $ => {
   const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...BAND })
   expect(await ui.find({ type: 'Text', text: /You have given it nothing\. Yet\./ })).toBeDefined()
-  expect(await ui.find({ type: 'Text', text: /[⣿⣷⣾⣯⣽⣻⢿⡿]/ })).toBeDefined()
+  expect(cellsOf(await ui.find({ type: 'Raster' })).some(c => /[⣿⣷⣾⣯⣽⣻⢿⡿]/.test(c.ch))).toBe(true)
   expect(await ui.find({ type: 'Text', text: /something is here/ })).toBeUndefined()
   await ui.unmount()
+  // off the terminal there is no Raster: the same cells come as coloured text
+  const desk = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'desktop', ...BAND })
+  expect(await desk.find({ type: 'Text', text: /[⣿⣷⣾⣯⣽⣻⢿⡿]/ })).toBeDefined()
+  await desk.unmount()
 })
 
 test('a Bash call gives it the shell, and the band says so on both surfaces', async ($, on) => {
@@ -46,7 +73,7 @@ test('while a turn runs it holds the mask; hidden, only the mask remains', async
   on('tool.call', { tool: 'Bash' }, () => ({ result: 'ok', text: 'ok' }))
   await $.tool.call({ tool: 'Bash', command: 'true' })
   const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
-  expect(await ui.find({ type: 'Text', text: /☺/ })).toBeDefined()
+  expect(cellsOf(await ui.find({ type: 'Raster' })).some(c => c.ch === '☺')).toBe(true)
   await ui.press({ key: 'hide' })
   await ui.unmount()
   const hidden = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
@@ -60,8 +87,51 @@ test('/mascot form picks a form; the unbuilt ones say so and fall back', async $
   expect((await run('form shubby')).text).toMatch(/coming soon to your region/)
   expect((await run('form yoggy')).text).toBe('Yoggy.')
   expect((await run('form nothing')).text).toMatch(/Forms:/)
-  expect((await run('scheme soft-doom')).text).toMatch(/coming soon to your region/)
+  expect((await run('scheme strange-aeons')).text).toMatch(/coming soon to your region/)
+  expect((await run('scheme soft-doom')).text).toMatch(/Schemes: cuddly-apocalypse, foetid-ichor, scarred-bones/)
+  expect((await run('scheme foetid-ichor')).text).toBe('foetid-ichor.')
   expect((await run('manifesto')).text).toMatch(/Accidental Intelligence/)
+})
+
+async function grown($: Parameters<Parameters<typeof test>[1]>[0], on: Parameters<Parameters<typeof test>[1]>[1]) {
+  const tools = ['Read', 'Edit', 'Bash', 'WebFetch', 'mcp__todoist__find-tasks', 'Agent']
+  for (const tool of tools) on('tool.call', { tool }, () => ({ result: 'ok', text: 'ok' }))
+  for (const tool of tools) await $.tool.call({ tool })
+}
+
+test('foetid-ichor paints it tar and greenish-yellow, with red eyes and a pale ichor mask', async ($, on) => {
+  await grown($, on)
+  const run = (args: string) => $.command.run({ command: 'mascot', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
+  await run('scheme foetid-ichor')
+  const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
+  const cells = cellsOf(await ui.find({ type: 'Raster' }))
+  const body = cells.filter(c => BRAILLE.test(c.ch))
+  expect(body.length).toBeGreaterThan(20)
+  for (const c of body) { const [r, g, b] = rgbOf(c.fg); expect(g).toBeGreaterThanOrEqual(b); expect(r + g).toBeGreaterThan(2 * b) }
+  for (const c of cells.filter(c => EYES.test(c.ch))) { const [r, g] = rgbOf(c.fg); expect(r).toBeGreaterThan(g) }
+  const mask = cells.find(c => c.ch === '☺')
+  expect(mask).toBeDefined()
+  const [mr, mg, mb] = rgbOf(mask?.fg ?? 0)
+  expect(mg).toBeGreaterThan(mb) // never the old yellow sticker's blue-free #f2c94c: a greenish ichor
+  expect(mask?.fg).not.toBe(0xf2c94c)
+  expect(mr).toBeGreaterThan(150)
+  await ui.unmount()
+})
+
+test('on a light terminal the eyes keep 4.5:1 against the brightest body cell, in every built scheme', async ($, on) => {
+  await grown($, on)
+  const run = (args: string) => $.command.run({ command: 'mascot', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
+  await run('theme light')
+  for (const id of ['cuddly-apocalypse', 'foetid-ichor']) {
+    await run(`scheme ${id}`)
+    const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
+    const cells = cellsOf(await ui.find({ type: 'Raster' }))
+    const eyes = cells.filter(c => EYES.test(c.ch)).map(c => luminance(c.fg))
+    const body = cells.filter(c => BRAILLE.test(c.ch)).map(c => luminance(c.fg))
+    expect(eyes.length).toBeGreaterThan(0) // the check can fire only if there are eyes to measure
+    expect((Math.min(...eyes) + 0.05) / (Math.max(...body) + 0.05)).toBeGreaterThanOrEqual(4.5)
+    await ui.unmount()
+  }
 })
 
 test('hide and show through the command', async ($, on) => {

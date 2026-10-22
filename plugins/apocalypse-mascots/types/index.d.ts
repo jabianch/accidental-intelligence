@@ -10,6 +10,7 @@ export type Reach = {
 
 export type Form = 'yoggy' | 'shubby' | 'shoggy'
 export type Theme = 'dark' | 'light'
+export type Scheme = 'cuddly-apocalypse' | 'foetid-ichor' | 'scarred-bones' | 'strange-aeons' | 'imitated-accents' | 'cosmic-pulsing'
 
 declare module 'claude-code' {
   interface PluginState {
@@ -18,6 +19,14 @@ declare module 'claude-code' {
       isHidden: boolean
       frame: number
       theme: Theme
+      scheme: Scheme
     }
+  }
+}
+
+// The engine's runtime has it (its own Raster example uses it); TypeScript's lib does not yet.
+declare global {
+  interface Uint8Array {
+    toBase64(): string
   }
 }

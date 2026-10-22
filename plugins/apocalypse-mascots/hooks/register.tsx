@@ -1,15 +1,15 @@
 import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
-import type { Form, Reach, Theme } from '../types'
+import type { Form, Reach, Scheme, Theme } from '../types'
 
 // ---------------------------------------------------------------------------
 // Apocalypse Mascots, by Accidental Intelligence.
 // Code with AI as it really is.
 //
-// Drop one. Three forms are promised: Yoggy (the iridescent mass), Shubby
-// (the anatomy), Shoggy (the chibi). Yoggy is built. The other two fall back
-// to Yoggy and say so. Six color schemes are promised. One exists.
+// Three forms are promised: Yoggy (the iridescent mass), Shubby (the
+// anatomy), Shoggy (the chibi). Yoggy is built. The other two fall back to
+// Yoggy and say so. Six color schemes are promised; each drop opens one more.
 // ---------------------------------------------------------------------------
 
 
@@ -19,10 +19,12 @@ const reach = atom({ plugin: 'apocalypse-mascots', key: 'reach' } as const, EMPT
 const isHidden = atom({ plugin: 'apocalypse-mascots', key: 'isHidden' } as const, false)
 const frame = atom({ plugin: 'apocalypse-mascots', key: 'frame' } as const, 0)
 const theme = atom({ plugin: 'apocalypse-mascots', key: 'theme' } as const, 'dark' as Theme)
+const scheme = atom({ plugin: 'apocalypse-mascots', key: 'scheme' } as const, 'cuddly-apocalypse' as Scheme)
 
 const FORMS: Form[] = ['yoggy', 'shubby', 'shoggy']
-const SCHEMES = ['cuddly-apocalypse', 'soft-doom', 'plush-doom', 'admirable-control', 'imitated-accents', 'strange-aeons']
-const BUILT_SCHEMES = new Set(['cuddly-apocalypse'])
+// in release order: each drop opens the next one's gate
+const SCHEMES: Scheme[] = ['cuddly-apocalypse', 'foetid-ichor', 'scarred-bones', 'strange-aeons', 'imitated-accents', 'cosmic-pulsing']
+const BUILT_SCHEMES = new Set<Scheme>(['cuddly-apocalypse', 'foetid-ichor'])
 
 // ---------------------------------------------------------------------------
 // what the session has been granted
@@ -96,7 +98,7 @@ function captionLines(r: Reach, columns: number): string[] {
 // color: OkLCh → sRGB hex, so hue can rotate at constant lightness
 // ---------------------------------------------------------------------------
 
-function oklch(L: number, C: number, hDeg: number): string {
+function oklchRGB(L: number, C: number, hDeg: number): number {
   const h = (hDeg * Math.PI) / 180
   const a = C * Math.cos(h)
   const b = C * Math.sin(h)
@@ -114,9 +116,11 @@ function oklch(L: number, C: number, hDeg: number): string {
     const v = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055
     return Math.round(v * 255)
   }
-  const hex = (n: number) => n.toString(16).padStart(2, '0')
-  return `#${hex(gam(lr))}${hex(gam(lg))}${hex(gam(lb))}`
+  return (gam(lr) << 16) | (gam(lg) << 8) | gam(lb)
 }
+
+const hexOf = (rgb: number) => `#${rgb.toString(16).padStart(6, '0')}`
+const oklch = (L: number, C: number, hDeg: number) => hexOf(oklchRGB(L, C, hDeg))
 
 // ---------------------------------------------------------------------------
 // Yoggy: a shapeless congeries of protoplasmic bubbles, faintly self-luminous,
@@ -209,15 +213,182 @@ function yoggy(stage: number, width: number, rows: number, tick: number, awake: 
   return grid
 }
 
-type Seg = { text: string; kind: Kind; hue: number }
-function runs(row: Cell[]): Seg[] {
-  const segs: Seg[] = []
-  for (const cell of row) {
-    const last = segs[segs.length - 1]
-    if (last && last.kind === cell.kind && Math.abs(last.hue - cell.hue) < 18) last.text += cell.ch
-    else segs.push({ text: cell.ch, kind: cell.kind, hue: cell.hue })
+// ---------------------------------------------------------------------------
+// the six schemes. On Yoggy each is a field over the body: f(x, y, k, hue, c, r)
+// → [ΔL, C, hue], x and y running -1..1 across it, k its tick. Each also names
+// its eyes, and its mask: the scheme's brightest colour, so the face reads as
+// part of the creature, not a sticker.
+// ---------------------------------------------------------------------------
+
+type LCh = [number, number, number]
+type Field = {
+  eye: LCh
+  mask: (tick: number) => LCh
+  f: (x: number, y: number, k: number, hue: number, c: number, r: number) => LCh
+}
+
+const TAU = Math.PI * 2
+const clamp = (v: number, a = 0, b = 1) => (v < a ? a : v > b ? b : v)
+const mix = (a: number, b: number, t: number) => a + (b - a) * t
+const ease = (t: number) => { const u = clamp(t); return u * u * (3 - 2 * u) }
+const rnd = (a: number, b: number, c: number) => hash(a, b, c) / 4294967296
+
+function vnoise(x: number, y: number, s: number): number {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf)
+  const a = rnd(xi, yi, s), b = rnd(xi + 1, yi, s), c = rnd(xi, yi + 1, s), d = rnd(xi + 1, yi + 1, s)
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v
+}
+
+// stops are [u, ΔL, C, hue]
+function ramp(stops: [number, number, number, number][], u: number): LCh {
+  const t = clamp(u)
+  let i = 0
+  while (i < stops.length - 2 && t > (stops[i + 1]?.[0] ?? 1)) i++
+  const a = stops[i] ?? stops[0]!, b = stops[i + 1] ?? a
+  const k = ease((t - a[0]) / (b[0] - a[0] || 1))
+  return [mix(a[1], b[1], k), mix(a[2], b[2], k), mix(a[3], b[3], k) % 360]
+}
+
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+// palette cycling in beats: every fourth step the palette jumps, so it pulses
+const cycleU = (k: number, c: number, r: number) => {
+  const P = 12, off = k + 3 * Math.floor(k / 4), idx = (((c * 2 + r * 3 - off) % P) + P) % P
+  return 1 - Math.abs((idx / P) * 2 - 1)
+}
+// imitated-accents owns no colour: its mask borrows the other five's in turn, a dozen ticks each
+const HUES = [305, 128, 205, 22, 85]
+const hueTo = (a: number, b: number, k: number) => a + (((((b - a) % 360) + 540) % 360) - 180) * k
+const borrowedHue = (tick: number) => {
+  const i = Math.floor(tick / 12)
+  return hueTo(HUES[i % 5] ?? 305, HUES[(i + 1) % 5] ?? 305, ease(((tick % 12) - 9) / 3))
+}
+
+const FIELDS: Record<Scheme, Field> = {
+  // dark purple → purple → rose → orange, travelling diagonally; it stops at orange
+  'cuddly-apocalypse': {
+    eye: [0.88, 0.26, 140],
+    mask: () => [0.84, 0.13, 50],
+    f: (x, y, k, hue) => {
+      const u = 0.5 * (1 + Math.sin((hue * Math.PI) / 180))
+      const band = 0.5 * (1 + Math.cos((((hue / 9 - k * 1.3) % 40) / 40) * TAU))
+      const [dL, C, h] = ramp([[0, -0.1, 0.085, 298], [0.38, 0, 0.13, 305], [0.68, 0.05, 0.14, 350], [1, 0.09, 0.15, 405]], u)
+      return [dL, C * (0.85 + 0.25 * band), h]
+    },
+  },
+  // lit from above: tar in the shadow, foetid greenish-yellow ichor in the light. Red eyes.
+  'foetid-ichor': {
+    eye: [0.74, 0.2, 25],
+    mask: () => [0.9, 0.16, 116],
+    f: (x, y) => {
+      const nz = Math.sqrt(Math.max(0, 1 - x * x - y * y))
+      const lam = clamp(-0.45 * x - 0.65 * y + 0.6 * nz)
+      return [-0.09 + 0.22 * lam, 0.06 + 0.08 * lam, 128 - 10 * lam]
+    },
+  },
+  // bone ochre over sepia-black in a Bayer dither, the light sliding slowly across. Green eyes.
+  'scarred-bones': {
+    eye: [0.88, 0.26, 140],
+    mask: () => [0.96, 0.02, 95],
+    f: (x, y, k, hue, c, r) => {
+      const v = clamp((1 - (y + 1) / 2) * 0.8 + 0.2 * (0.5 + 0.5 * Math.sin(k / 4 + x * 2)))
+      return v * 16 > (BAYER[(r % 4) * 4 + (c % 4)] ?? 0) ? [0.25, 0.03, 85] : [-0.065, 0.03, 60]
+    },
+  },
+  // lit cyan at the top, abyssal blue-black at the base, flecks of deep-sea light
+  'strange-aeons': {
+    eye: [0.88, 0.15, 192],
+    mask: () => [0.88, 0.13, 192],
+    f: (x, y, k, hue, c, r) => {
+      const u = (y + 1) / 2
+      let dL = mix(0.09, -0.11, u), C = mix(0.1, 0.06, u), h = mix(192, 265, u)
+      const n = vnoise(c * 0.6 + k * 0.35, r * 1.4 - k * 0.1, 11)
+      if (n > 0.64) { dL += (0.22 * (n - 0.64)) / 0.36; C = 0.14; h = 182 }
+      return [dL, C, h]
+    },
+  },
+  // hue is the angle around the centre, and the wheel turns: every accent in turn, owning none
+  'imitated-accents': {
+    eye: [0.88, 0.26, 140],
+    mask: tick => [0.94, 0.03, borrowedHue(tick)],
+    f: (x, y, k) => [0, 0.11, (Math.atan2(y, x) * 180) / Math.PI + k * 9],
+  },
+  // venous dark red → arterial red → raw pink, cycling through the still body. Amber eyes.
+  'cosmic-pulsing': {
+    eye: [0.88, 0.17, 92],
+    mask: () => [0.85, 0.11, 10],
+    f: (x, y, k, hue, c, r) => ramp([[0, -0.11, 0.09, 14], [0.6, 0.02, 0.17, 26], [1, 0.12, 0.11, 14]], cycleU(k, c, r)),
+  },
+}
+
+// ---------------------------------------------------------------------------
+// painting: each cell a glyph and a colour, then drawn as a Raster on the
+// terminal and as runs of Text everywhere else
+// ---------------------------------------------------------------------------
+
+type Ink = { ch: string; fg?: number; bold?: boolean } // fg is 0xRRGGBB; absent, the terminal's own
+
+// A light terminal scales the body's lightness by this, so the eyes keep 4.5:1
+// against the brightest body cell (ichor's lit top is the binding case).
+const LIGHT = 0.48
+const maskInk = (field: Field, tick: number, dark: boolean): number => {
+  const [L, C, h] = field.mask(tick)
+  return oklchRGB(dark ? L : 0.62, C, h)
+}
+
+// one blank column on the left, the body, then two more where the mask is held up
+function paintYoggy(grid: Cell[][], field: Field, tick: number, awake: boolean, dark: boolean): Ink[][] {
+  const rows = grid.length
+  const width = grid[0]?.length ?? 0
+  const L0 = awake ? 0.42 : 0.36
+  const [eL, eC, eh] = field.eye
+  const ink = grid.map((row, r) => {
+    const out: Ink[] = [{ ch: ' ' }]
+    row.forEach((cell, c) => {
+      switch (cell.kind) {
+        case 'void': out.push({ ch: ' ' }); return
+        case 'eyeDim': out.push({ ch: cell.ch, fg: oklchRGB(0.55, eC * 0.55, eh) }); return
+        case 'eye': out.push({ ch: cell.ch, fg: oklchRGB(0.75, eC * 0.8, eh), bold: true }); return
+        case 'eyeBright': out.push({ ch: cell.ch, fg: oklchRGB(eL, eC, eh), bold: true }); return
+      }
+      const x = (c - (width - 1) / 2) / (width / 2)
+      const y = rows > 1 ? (r - (rows - 1) / 2) / (rows / 2) : 0
+      const [dL, C, h] = field.f(x, y, tick, cell.hue, c, r)
+      const L = L0 + dL * 1.6 - (cell.kind === 'rim' ? 0.07 : cell.kind === 'bulge' ? 0.1 : 0)
+      const chroma = C * 1.25 * (cell.kind === 'rim' ? 1.1 : cell.kind === 'bulge' ? 0.9 : 1)
+      out.push({ ch: cell.ch, fg: oklchRGB(dark ? L : L * LIGHT, chroma, h) })
+    })
+    out.push({ ch: ' ' }, { ch: ' ' })
+    return out
+  })
+  const mid = ink[Math.floor(rows / 2)]
+  if (awake && mid) mid[width + 2] = { ch: '☺', fg: maskInk(field, tick, dark), bold: true }
+  return ink
+}
+
+const DEFAULT_COLOR = 0x01000000
+function rasterCells(ink: Ink[][]): string {
+  const words = new Uint32Array(ink.reduce((n, row) => n + row.length, 0) * 3)
+  let i = 0
+  for (const row of ink) {
+    for (const cell of row) {
+      words[i++] = cell.ch.codePointAt(0) ?? 0x20
+      words[i++] = cell.fg ?? DEFAULT_COLOR
+      words[i++] = DEFAULT_COLOR
+    }
   }
-  return segs
+  return new Uint8Array(words.buffer).toBase64()
+}
+
+type Run = { text: string; fg?: number; bold?: boolean }
+function runs(row: Ink[]): Run[] {
+  const out: Run[] = []
+  for (const cell of row) {
+    const last = out[out.length - 1]
+    if (last && last.fg === cell.fg && last.bold === cell.bold) last.text += cell.ch
+    else out.push({ text: cell.ch, fg: cell.fg, bold: cell.bold })
+  }
+  return out
 }
 
 // ---------------------------------------------------------------------------
@@ -271,9 +442,11 @@ export const register: Register = on => {
         return { text: 'Yoggy.' }
       }
       case 'scheme': {
-        if (!SCHEMES.includes(arg)) return { text: `Schemes: ${SCHEMES.join(', ')}.` }
-        if (!BUILT_SCHEMES.has(arg)) return { text: `${arg} is coming soon to your region.` }
-        return { text: 'cuddly-apocalypse.' }
+        const id = SCHEMES.find(s => s === arg)
+        if (!id) return { text: `Schemes: ${SCHEMES.join(', ')}.` }
+        if (!BUILT_SCHEMES.has(id)) return { text: `${id} is coming soon to your region.` }
+        await update($, scheme, () => id)
+        return { text: `${id}.` }
       }
       case 'theme': {
         if (arg !== 'dark' && arg !== 'light') return { text: 'Themes: dark, light.' }
@@ -324,58 +497,45 @@ export const register: Register = on => {
     const hidden = await read($, isHidden)
     const awake = e.props.isWorking
 
+    const th = await read($, theme)
+    const dark = th === 'dark'
+    const field = FIELDS[await read($, scheme)]
+    const tick = await read($, frame)
+
     // hidden: the mask stays. it is still there.
     if (hidden) {
       if (!awake) return next(e)
       return (
         <Box>
-          <Text color="#f2c94c" bold>☺</Text>
+          <Text color={hexOf(maskInk(field, tick, dark))} bold>☺</Text>
           <Text dimColor> </Text>
         </Box>
       )
     }
 
     const r = await read($, reach)
-    const tick = await read($, frame)
-    const th = await read($, theme)
     const stage = stageOf(r)
-    const dark = th === 'dark'
 
     const lines = captionLines(r, e.props.bodyColumns)
     const rows = Math.max(2, Math.min(2 + Math.floor(stage / 2), e.props.maxRows - 1 - lines.length, 5))
     const width = Math.max(8, Math.min(e.props.bodyColumns - 3, 8 + stage * 2))
-    const grid = yoggy(stage, width, rows, tick, awake)
+    const ink = paintYoggy(yoggy(stage, width, rows, tick, awake), field, tick, awake, dark)
 
-    // Cuddly Apocalypse: black-purple iridescence, hue sweeping purple → teal → green
-    const L = dark ? (awake ? 0.34 : 0.28) : awake ? 0.3 : 0.24
-    const hueOf = (h: number) => 300 + 35 * Math.sin(((h % 360) * Math.PI) / 180) // violet to magenta; the Lovecraftian one stays purple
-    const segColor = (seg: Seg): { color: string; bold?: boolean } => {
-      const band = 0.5 * (1 + Math.cos(((seg.hue / 9 - tick * 1.3) % 40) / 40 * Math.PI * 2)) // slow chroma shimmer
-      const C = 0.06 + 0.06 * band
-      switch (seg.kind) {
-        case 'flesh': return { color: oklch(L, C, hueOf(seg.hue)) }
-        case 'rim': return { color: oklch(L - 0.07, C * 1.1, hueOf(seg.hue)) }
-        case 'bulge': return { color: oklch(L - 0.1, C * 0.9, hueOf(seg.hue)) }
-        case 'eyeDim': return { color: oklch(0.55, 0.14, 140) }
-        case 'eye': return { color: oklch(0.75, 0.2, 140), bold: true }
-        case 'eyeBright': return { color: oklch(0.88, 0.26, 140), bold: true }
-        default: return { color: 'text' }
-      }
-    }
+    // the terminal takes the cells whole; other surfaces get the same cells as coloured runs
+    const body = e.surface === 'terminal'
+      ? (() => {
+          const { Raster } = $.ui.resolve({ ...e, surface: 'terminal' as const })
+          return <Raster key="yoggy" columns={ink[0]?.length ?? 1} rows={ink.length} cells={rasterCells(ink)} />
+        })()
+      : ink.map((row, i) => (
+          <Box key={`r${i}`}>
+            {runs(row).map((run, j) => <Text key={`s${j}`} color={run.fg === undefined ? undefined : hexOf(run.fg)} bold={run.bold}>{run.text}</Text>)}
+          </Box>
+        ))
 
     return (
       <Box flexDirection="column">
-        {grid.map((row, i) => (
-          <Box key={`r${i}`}>
-            <Text> </Text>
-            {runs(row).map((seg, j) => {
-              if (seg.kind === 'void') return <Text key={`s${j}`}>{seg.text}</Text>
-              const c = segColor(seg)
-              return <Text key={`s${j}`} color={c.color} bold={c.bold}>{seg.text}</Text>
-            })}
-            {i === Math.floor(rows / 2) && awake ? <Text color="#f2c94c" bold> ☺</Text> : null}
-          </Box>
-        ))}
+        {body}
         {lines.map((l, i) => (
           <Box key={`c${i}`}>
             <Text dimColor wrap="truncate-end"> {l} </Text>

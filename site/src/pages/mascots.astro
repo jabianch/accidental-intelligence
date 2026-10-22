@@ -2,6 +2,8 @@
 import { inline } from '../inline'
 import Base from '../layouts/Base.astro'
 import copy from '../copy.json'
+// the schemes whose gates are open; each drop adds the next in copy.schemes' order
+const BUILT = new Set(['cuddly-apocalypse', 'foetid-ichor'])
 // a 3D price sticker: scalloped seal, offset shade layer for depth
 const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a = (Math.PI * i) / n - Math.PI / 2; const r = i % 2 ? r2 : r1; return `${(c + r * Math.cos(a)).toFixed(1)},${(c + r * Math.sin(a)).toFixed(1)}` }).join(' ')
 ---
@@ -10,7 +12,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
   <style is:global>
     .titlewrap{position:relative;display:inline-block;margin:0 0 calc(min(270px,36vw)*.45)}
     h1.title{font:400 clamp(2rem,9.2vw,5rem)/1 var(--loud);letter-spacing:.01em;margin:0;display:inline-block;position:relative;white-space:nowrap}
-    h1.title span{position:relative;z-index:2;background:linear-gradient(100deg,#2a1540 0%,#5b2d8a 28%,#a63a9a 52%,#6f8f2a 78%,#c98b1a 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    h1.title span{position:relative;z-index:2;background:linear-gradient(180deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.42) 20%,rgba(255,255,255,0) 42%,rgba(0,0,0,0) 56%,rgba(0,0,0,.5) 100%),radial-gradient(ellipse 18% 75% at 86% 40%,rgba(126,249,98,0.9),rgba(130,240,106,0) 70%),radial-gradient(ellipse 14% 70% at 20% 62%,rgba(209,85,218,0.75),rgba(178,77,200,0) 70%),linear-gradient(100deg,#40105e 0%,#421568 6.3%,#431a73 12.5%,#441f7d 18.8%,#442488 25%,#412c92 31.3%,#323d98 37.5%,#1e4b9a 43.8%,#005898 50%,#006495 56.3%,#007093 62.5%,#007a8f 68.8%,#008488 75%,#008e81 81.3%,#009873 87.5%,#009f5d 93.8%,#44a53b 100%); /* title C: the purple-to-green arc in OkLCh, lit from above, a dark base, a glow inside each word */-webkit-background-clip:text;background-clip:text;color:transparent}
     h1.title::after{content:attr(data-text);position:absolute;left:3px;top:4px;z-index:1;color:#1b1b1b;white-space:nowrap}
     h1.title::before{content:attr(data-text);position:absolute;left:0;top:12px;z-index:0;color:transparent;text-shadow:0 10px 18px rgba(27,27,27,.28);white-space:nowrap}
     svg.tentacle{position:absolute;left:2%;bottom:calc(min(270px,36vw)*-.42);width:min(270px,36vw);height:auto;transform-origin:72% 6%;animation:sway 5s ease-in-out infinite;z-index:3;pointer-events:none}
@@ -107,9 +109,11 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
     .txt .god{font:12px var(--mono);color:var(--ink3);display:block;margin-bottom:12px}
     .txt p{margin:0 0 16px;font-size:16px;color:var(--ink2);max-width:460px}
     /* schemes */
-    .schemes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}@media(min-width:700px){.schemes{grid-template-columns:repeat(6,1fr)}}
+    .schemes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}@media(min-width:700px){.schemes{grid-template-columns:repeat(6,minmax(0,1fr))}}
     .swatch{border:1px solid var(--line);border-radius:4px;background:#fff;padding:10px;font:11px/1.4 var(--mono);color:var(--ink2);text-align:center;cursor:pointer}
-    .swatch i{display:block;height:64px;border-radius:2px;margin-bottom:8px;background:repeating-linear-gradient(90deg,#2a1540 0 8px,#3b1f5e 8px 16px,#5b2d8a 16px 24px,#7a3fa8 24px 32px)}
+    .swatch i{display:block;height:64px;border-radius:2px;margin-bottom:8px}
+    .swatch pre{display:flex;align-items:center;justify-content:center;height:64px;margin:0 0 8px;border-radius:2px;background:var(--term);font:11px/1 var(--mono);white-space:pre;overflow:hidden}
+    .swatch.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
     .swatch.soon i{background:repeating-linear-gradient(45deg,#e5e5e5 0 6px,#d6d6d6 6px 12px)}.swatch.soon{color:var(--ink3)}
     /* specs */
     .spec{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;font:13px/1.7 var(--mono);max-width:680px}
@@ -192,7 +196,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
   if (id === 'schemes') return (
   <section data-section="schemes">
     <div class="band" data-k="schemesTitle">{copy.schemesTitle}</div>
-    <div class="schemes">{copy.schemes.map((s, i) => (<div class={`swatch ${i ? 'soon' : ''}`} data-scheme={s}><i></i><span data-k={`schemes.${i}`}>{s}</span></div>))}</div>
+    <div class="schemes">{copy.schemes.map((s, i) => (<div class={`swatch ${BUILT.has(s) ? (i ? '' : 'on') : 'soon'}`} data-scheme={s}>{BUILT.has(s) ? <pre data-swatch={s}></pre> : <i></i>}<span data-k={`schemes.${i}`}>{s}</span></div>))}</div>
   </section>)
   if (id === 'specs') return (
   <section data-section="specs" id="specs">
