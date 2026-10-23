@@ -104,6 +104,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
     @media(min-width:800px){.row{grid-template-columns:1fr 1fr;gap:48px}.row.flip .viz{order:2}}
     .viz{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:6px;min-height:360px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 12px rgba(0,0,0,.06)}
     .viz pre{margin:0;font:clamp(16px,2.4vw,22px)/1.15 var(--mono);white-space:pre}
+    .viz:has(> pre){background:var(--term);border-color:#2a2635;box-shadow:inset 0 2px 14px rgba(0,0,0,.55)} /* a creature sits on the terminal's dark, the ground its schemes are drawn for */
     .viz .q{font:400 160px/1 var(--loud);color:var(--line)}
     .viz .badge{position:absolute;left:-12px;top:16px;background:var(--red);color:#fff;font:400 16px var(--loud);letter-spacing:.04em;padding:8px 14px 6px;transform:rotate(-6deg);box-shadow:0 3px 0 rgba(27,27,27,.9)}
     .viz .badge.ok{background:var(--burst);color:var(--ink);box-shadow:0 3px 0 var(--burst-shade)}

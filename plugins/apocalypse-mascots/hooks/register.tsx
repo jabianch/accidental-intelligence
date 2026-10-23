@@ -328,16 +328,13 @@ const FIELDS: Record<Scheme, Field> = {
 
 type Ink = { ch: string; fg?: number; bold?: boolean } // fg is 0xRRGGBB; absent, the terminal's own
 
-// A light terminal scales the body's lightness by this, so the eyes keep 4.5:1
-// against the brightest body cell (ichor's lit top is the binding case).
-const LIGHT = 0.48
-const maskInk = (field: Field, tick: number, dark: boolean): number => {
-  const [L, C, h] = field.mask(tick)
-  return oklchRGB(dark ? L : 0.62, C, h)
-}
+// The schemes are drawn for a dark ground. On a light terminal the creature
+// brings its own: every cell it paints sits on the terminal dark of the site.
+const GROUND = 0x0d0b14
+const maskInk = (field: Field, tick: number): number => oklchRGB(...field.mask(tick))
 
 // one blank column on the left, the body, then two more where the mask is held up
-function paintYoggy(grid: Cell[][], field: Field, tick: number, awake: boolean, dark: boolean): Ink[][] {
+function paintYoggy(grid: Cell[][], field: Field, tick: number, awake: boolean): Ink[][] {
   const rows = grid.length
   const width = grid[0]?.length ?? 0
   const L0 = awake ? 0.42 : 0.36
@@ -356,25 +353,25 @@ function paintYoggy(grid: Cell[][], field: Field, tick: number, awake: boolean, 
       const [dL, C, h] = field.f(x, y, tick, cell.hue, c, r)
       const L = L0 + dL * 1.6 - (cell.kind === 'rim' ? 0.07 : cell.kind === 'bulge' ? 0.1 : 0)
       const chroma = C * 1.25 * (cell.kind === 'rim' ? 1.1 : cell.kind === 'bulge' ? 0.9 : 1)
-      out.push({ ch: cell.ch, fg: oklchRGB(dark ? L : L * LIGHT, chroma, h) })
+      out.push({ ch: cell.ch, fg: oklchRGB(L, chroma, h) })
     })
     out.push({ ch: ' ' }, { ch: ' ' })
     return out
   })
   const mid = ink[Math.floor(rows / 2)]
-  if (awake && mid) mid[width + 2] = { ch: '☺', fg: maskInk(field, tick, dark), bold: true }
+  if (awake && mid) mid[width + 2] = { ch: '☺', fg: maskInk(field, tick), bold: true }
   return ink
 }
 
 const DEFAULT_COLOR = 0x01000000
-function rasterCells(ink: Ink[][]): string {
+function rasterCells(ink: Ink[][], ground: number): string {
   const words = new Uint32Array(ink.reduce((n, row) => n + row.length, 0) * 3)
   let i = 0
   for (const row of ink) {
     for (const cell of row) {
       words[i++] = cell.ch.codePointAt(0) ?? 0x20
       words[i++] = cell.fg ?? DEFAULT_COLOR
-      words[i++] = DEFAULT_COLOR
+      words[i++] = ground
     }
   }
   return new Uint8Array(words.buffer).toBase64()
@@ -507,7 +504,7 @@ export const register: Register = on => {
       if (!awake) return next(e)
       return (
         <Box>
-          <Text color={hexOf(maskInk(field, tick, dark))} bold>☺</Text>
+          <Text color={hexOf(maskInk(field, tick))} backgroundColor={dark ? undefined : hexOf(GROUND)} bold>☺</Text>
           <Text dimColor> </Text>
         </Box>
       )
@@ -519,17 +516,17 @@ export const register: Register = on => {
     const lines = captionLines(r, e.props.bodyColumns)
     const rows = Math.max(2, Math.min(2 + Math.floor(stage / 2), e.props.maxRows - 1 - lines.length, 5))
     const width = Math.max(8, Math.min(e.props.bodyColumns - 3, 8 + stage * 2))
-    const ink = paintYoggy(yoggy(stage, width, rows, tick, awake), field, tick, awake, dark)
+    const ink = paintYoggy(yoggy(stage, width, rows, tick, awake), field, tick, awake)
 
     // the terminal takes the cells whole; other surfaces get the same cells as coloured runs
     const body = e.surface === 'terminal'
       ? (() => {
           const { Raster } = $.ui.resolve({ ...e, surface: 'terminal' as const })
-          return <Raster key="yoggy" columns={ink[0]?.length ?? 1} rows={ink.length} cells={rasterCells(ink)} />
+          return <Raster key="yoggy" columns={ink[0]?.length ?? 1} rows={ink.length} cells={rasterCells(ink, dark ? DEFAULT_COLOR : GROUND)} />
         })()
       : ink.map((row, i) => (
           <Box key={`r${i}`}>
-            {runs(row).map((run, j) => <Text key={`s${j}`} color={run.fg === undefined ? undefined : hexOf(run.fg)} bold={run.bold}>{run.text}</Text>)}
+            {runs(row).map((run, j) => <Text key={`s${j}`} color={run.fg === undefined ? undefined : hexOf(run.fg)} backgroundColor={dark ? undefined : hexOf(GROUND)} bold={run.bold}>{run.text}</Text>)}
           </Box>
         ))
 

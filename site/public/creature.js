@@ -1,5 +1,5 @@
 // The creature, ported from plugins/apocalypse-mascots/hooks/register.tsx. Constants identical.
-// window.Creature.mount(el, { stage, awake, scheme, onLight }) → instance { setStage, setAwake, setHidden, setScheme }
+// window.Creature.mount(el, { stage, awake, scheme }) → instance { setStage, setAwake, setHidden, setScheme }
 // window.Creature.swatch(el, scheme) draws a scheme on a plain body, in half-block pixels.
 (function () {
 const DENSE=['⣿','⣷','⣾','⣯','⣽','⣻','⢿','⡿'],RIM=['⣤','⣀','⠿','⣆','⣰','⡇','⢸','⠶','⣄','⣠'],BULGE=['⠁','⠂','⠄','⡀','⢀','⠈','⠐','⠠'];
@@ -24,17 +24,17 @@ const FIELDS={
   'imitated-accents':{eye:[0.88,0.26,140],mask:t=>[0.94,0.03,borrowedHue(t)],f:(x,y,k)=>[0,0.11,Math.atan2(y,x)*180/Math.PI+k*9]},
   'cosmic-pulsing':{eye:[0.88,0.17,92],mask:()=>[0.85,0.11,10],f:(x,y,k,hue,c,r)=>ramp([[0,-0.11,0.09,14],[0.6,0.02,0.17,26],[1,0.12,0.11,14]],cycleU(k,c,r))},
 };
-const LIGHT=0.48; // on a light ground the body's lightness is scaled, so the eyes keep 4.5:1 against it
-const maskColor=(F,tick,onLight)=>{const [L,C,h]=F.mask(tick);return oklch(onLight?0.62:L,C,h)};
-function paint(grid,tick,awake,F,onLight){const rows=grid.length,width=grid[0]?grid[0].length:0,L0=awake?0.42:0.36,[eL,eC,eh]=F.eye;
+// every creature is drawn on a dark ground, the terminal's, which is where the schemes were designed
+const maskColor=(F,tick)=>oklch(...F.mask(tick));
+function paint(grid,tick,awake,F){const rows=grid.length,width=grid[0]?grid[0].length:0,L0=awake?0.42:0.36,[eL,eC,eh]=F.eye;
   const col=(cell,r,c)=>{switch(cell.kind){case 'eyeDim':return [oklch(0.55,eC*0.55,eh),''];case 'eye':return [oklch(0.75,eC*0.8,eh),'font-weight:700'];case 'eyeBright':return [oklch(eL,eC,eh),'font-weight:700']}
     const x=(c-(width-1)/2)/(width/2),y=rows>1?(r-(rows-1)/2)/(rows/2):0,[dL,C,h]=F.f(x,y,tick,cell.hue,c,r),k=cell.kind==='rim'?1:cell.kind==='bulge'?2:0;
-    const L=L0+dL*1.6-[0,0.07,0.1][k];return [oklch(onLight?L*LIGHT:L,C*1.25*[1,1.1,0.9][k],h),'']};
-  let html='';grid.forEach((row,r)=>{row.forEach((cell,c)=>{if(cell.kind==='void'){html+=' ';return}const [fg,extra]=col(cell,r,c);html+='<span style="color:'+fg+';'+extra+'">'+esc(cell.ch)+'</span>'});if(r===Math.floor(rows/2)&&awake)html+=' <span style="color:'+maskColor(F,tick,onLight)+';font-weight:700">☺</span>';html+='\n'});return html}
-function mount(el,opts){opts=Object.assign({stage:3,awake:false,hidden:false,scheme:'cuddly-apocalypse',onLight:false,rowsFor:s=>Math.max(2,Math.min(2+Math.floor(s/2),5)),widthFor:s=>Math.max(8,Math.min(22,8+s*2))},opts||{});
+    const L=L0+dL*1.6-[0,0.07,0.1][k];return [oklch(L,C*1.25*[1,1.1,0.9][k],h),'']};
+  let html='';grid.forEach((row,r)=>{row.forEach((cell,c)=>{if(cell.kind==='void'){html+=' ';return}const [fg,extra]=col(cell,r,c);html+='<span style="color:'+fg+';'+extra+'">'+esc(cell.ch)+'</span>'});if(r===Math.floor(rows/2)&&awake)html+=' <span style="color:'+maskColor(F,tick)+';font-weight:700">☺</span>';html+='\n'});return html}
+function mount(el,opts){opts=Object.assign({stage:3,awake:false,hidden:false,scheme:'cuddly-apocalypse',rowsFor:s=>Math.max(2,Math.min(2+Math.floor(s/2),5)),widthFor:s=>Math.max(8,Math.min(22,8+s*2))},opts||{});
   const st={stage:opts.stage,awake:opts.awake,hidden:opts.hidden,scheme:opts.scheme,tick:0};
-  function render(){const F=FIELDS[st.scheme];if(st.hidden){el.innerHTML=st.awake?'<span style="color:'+maskColor(F,st.tick,opts.onLight)+';font-weight:700">☺</span>':'';return}
-    const rows=opts.rowsFor(st.stage),width=opts.widthFor(st.stage);el.innerHTML=paint(yoggy(st.stage,width,rows,st.tick,st.awake),st.tick,st.awake,F,opts.onLight)}
+  function render(){const F=FIELDS[st.scheme];if(st.hidden){el.innerHTML=st.awake?'<span style="color:'+maskColor(F,st.tick)+';font-weight:700">☺</span>':'';return}
+    const rows=opts.rowsFor(st.stage),width=opts.widthFor(st.stage);el.innerHTML=paint(yoggy(st.stage,width,rows,st.tick,st.awake),st.tick,st.awake,F)}
   let timer=null;function pace(){clearInterval(timer);timer=setInterval(()=>{st.tick++;render()},st.awake?300:1800)}
   render();pace();
   return {setStage(s){st.stage=s;render()},setAwake(a){st.awake=a;render();pace()},setHidden(h){st.hidden=h;render()},setScheme(id){if(FIELDS[id]){st.scheme=id;render()}},get state(){return st},render}}

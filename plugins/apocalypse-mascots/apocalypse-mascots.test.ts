@@ -9,7 +9,7 @@ const WORKING = { ...BAND, props: { ...BAND.props, isWorking: true } } as const
 
 // a Raster's cells: base64 of little-endian u32 triplets [codePoint, foreground, background]
 const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-function cellsOf(el: RenderElement | undefined): { ch: string; fg: number }[] {
+function cellsOf(el: RenderElement | undefined): { ch: string; fg: number; bg: number }[] {
   const b64 = String((el as Extract<RenderElement, { type: 'Raster' }> | undefined)?.props.cells ?? '').replace(/=+$/, '')
   const bytes: number[] = []
   for (let i = 0; i < b64.length; i += 4) {
@@ -18,17 +18,13 @@ function cellsOf(el: RenderElement | undefined): { ch: string; fg: number }[] {
     bytes.push((v >> 16) & 255, (v >> 8) & 255, v & 255)
   }
   const u32 = (i: number) => ((bytes[i] ?? 0) | ((bytes[i + 1] ?? 0) << 8) | ((bytes[i + 2] ?? 0) << 16) | ((bytes[i + 3] ?? 0) << 24)) >>> 0
-  const out: { ch: string; fg: number }[] = []
-  for (let i = 0; i + 12 <= Math.floor((b64.length * 3) / 4); i += 12) out.push({ ch: String.fromCodePoint(u32(i)), fg: u32(i + 4) })
+  const out: { ch: string; fg: number; bg: number }[] = []
+  for (let i = 0; i + 12 <= Math.floor((b64.length * 3) / 4); i += 12) out.push({ ch: String.fromCodePoint(u32(i)), fg: u32(i + 4), bg: u32(i + 8) })
   return out
 }
 const BRAILLE = /[\u2801-\u28ff]/
 const EYES = /[◉•]/
 const rgbOf = (fg: number) => [(fg >> 16) & 255, (fg >> 8) & 255, fg & 255] as const
-const luminance = (fg: number) => {
-  const [r, g, b] = rgbOf(fg).map(v => { const c = v / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4 })
-  return 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0)
-}
 
 test('before anything is granted, it is already a small cloud, not two dots', async $ => {
   const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...BAND })
@@ -118,19 +114,23 @@ test('foetid-ichor paints it tar and greenish-yellow, with red eyes and a pale i
   await ui.unmount()
 })
 
-test('on a light terminal the eyes keep 4.5:1 against the brightest body cell, in every built scheme', async ($, on) => {
+test('on a light terminal it brings its own dark ground and keeps its scheme, in every built scheme', async ($, on) => {
   await grown($, on)
   const run = (args: string) => $.command.run({ command: 'mascot', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
-  await run('theme light')
   for (const id of ['cuddly-apocalypse', 'foetid-ichor']) {
     await run(`scheme ${id}`)
-    const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
-    const cells = cellsOf(await ui.find({ type: 'Raster' }))
-    const eyes = cells.filter(c => EYES.test(c.ch)).map(c => luminance(c.fg))
-    const body = cells.filter(c => BRAILLE.test(c.ch)).map(c => luminance(c.fg))
-    expect(eyes.length).toBeGreaterThan(0) // the check can fire only if there are eyes to measure
-    expect((Math.min(...eyes) + 0.05) / (Math.max(...body) + 0.05)).toBeGreaterThanOrEqual(4.5)
-    await ui.unmount()
+    const drawn: Record<string, { ch: string; fg: number; bg: number }[]> = {}
+    for (const th of ['dark', 'light']) {
+      await run(`theme ${th}`)
+      const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
+      drawn[th] = cellsOf(await ui.find({ type: 'Raster' }))
+      await ui.unmount()
+    }
+    const dark = drawn.dark ?? [], light = drawn.light ?? []
+    expect(light.length).toBeGreaterThan(20)
+    for (const c of dark) expect(c.bg).toBe(0x01000000) // a dark terminal shows through
+    for (const c of light) expect(c.bg).toBe(0x0d0b14)
+    expect(light.map(c => c.fg)).toEqual(dark.map(c => c.fg)) // the same colours, never darkened to tar
   }
 })
 
