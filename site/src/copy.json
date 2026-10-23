@@ -2,8 +2,8 @@
   "order": [
     "hero",
     "why",
-    "forms",
     "schemes",
+    "forms",
     "specs"
   ],
   "lab": "Accidental Intelligence",
