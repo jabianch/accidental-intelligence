@@ -30,7 +30,7 @@ Answer `y` to add the marketplace, then pick the user scope. Site: https://accid
 
 cuddly-apocalypse (built) · foetid-ichor (built) · scarred-bones · strange-aeons · imitated-accents · cosmic-pulsing
 
-`/mascot scheme foetid-ichor` paints it tar in the shadow and foetid greenish-yellow ichor in the light, with red eyes. One more scheme opens with each drop.
+`/mascot scheme foetid-ichor` paints it tar in the shadow and foetid greenish-yellow ichor in the light, with red eyes. The other four open in later drops, alongside Shubby and Shoggy.
 
 ## What it does
 
