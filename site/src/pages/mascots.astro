@@ -4,6 +4,8 @@ import Base from '../layouts/Base.astro'
 import copy from '../copy.json'
 // the schemes whose gates are open; each drop adds the next in copy.schemes' order
 const BUILT = new Set(['cuddly-apocalypse', 'foetid-ichor'])
+// the newest release: the full-growth example opens in it; the hero terminal keeps Yoggy's native
+const LATEST = 'foetid-ichor'
 // a 3D price sticker: scalloped seal, offset shade layer for depth
 const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a = (Math.PI * i) / n - Math.PI / 2; const r = i % 2 ? r2 : r1; return `${(c + r * Math.cos(a)).toFixed(1)},${(c + r * Math.sin(a)).toFixed(1)}` }).join(' ')
 ---
@@ -161,7 +163,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
   if (id === 'why') return (
   <section data-section="why" id="why" class="prose">
     <div class="fullgrowth">
-      <div class="viz tall"><pre id="viz-full"></pre><span class="badge ok" data-k="fullBadge">{copy.fullBadge}</span></div>
+      <div class="viz tall"><pre id="viz-full" data-start={LATEST}></pre><span class="badge ok" data-k="fullBadge">{copy.fullBadge}</span></div>
       <p class="note" data-k="fullNote">{copy.fullNote}</p>
     </div>
     <h2 class="lab" data-k="whyTitle">{copy.whyTitle}</h2>
@@ -196,7 +198,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
   if (id === 'schemes') return (
   <section data-section="schemes">
     <div class="band" data-k="schemesTitle">{copy.schemesTitle}</div>
-    <div class="schemes">{copy.schemes.map((s, i) => (<div class={`swatch ${BUILT.has(s) ? (i ? '' : 'on') : 'soon'}`} data-scheme={s}>{BUILT.has(s) ? <pre data-swatch={s}></pre> : <i></i>}<span data-k={`schemes.${i}`}>{s}</span></div>))}</div>
+    <div class="schemes">{copy.schemes.map((s, i) => (<div class={`swatch ${BUILT.has(s) ? '' : 'soon'}`} data-scheme={s}>{BUILT.has(s) ? <pre data-swatch={s}></pre> : <i></i>}<span data-k={`schemes.${i}`}>{s}</span></div>))}</div>
   </section>)
   if (id === 'specs') return (
   <section data-section="specs" id="specs">
