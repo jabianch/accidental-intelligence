@@ -93,3 +93,15 @@ Design reasoning, in order, the way Pippin Barr keeps it. Newest entry last. The
 **Notes.** In my own terminal it started as literally two green dots, one slightly bigger than the other. Two dots is crazy. It should start as the small purple cloud of protoplasm and grow from there.
 
 **Done.** Stage 0 is now the creature at its smallest (8×2, three eyes forming and unforming) over "You have given it nothing. Yet." The two-dots-and-"something is here" branch is gone from the plugin and from the site's renderer, where it was already unused. The first test now looks for the cloud and the empty caption, and fails against the old code.
+
+## 2026-10-22 to 23 — Foetid-ichor, the first drop
+
+**Notes.** Ship the ichor scheme. Picking Ichor under the color schemes should change the three forms and the full-growth panel, and the full growth under the install line should show the newest scheme. Then: ichor on the full growth and on Yoggy looked like dark gray with pink dots. It was giving the wrong impression; look at real screenshots and fix it. Then the six schemes belong above the three forms, so a pick shows on the forms as you scroll down to them, and finally directly under the full growth, so What it is leads straight into the forms.
+
+**Done.** `/mascot scheme foetid-ichor` paints Yoggy tar in the shadow and greenish-yellow ichor in the light, with red eyes and a pale mask; the other four schemes answer "coming soon". Every scheme is one field over the body, ported from the design rounds, shared by the plugin and the site. On the site the full growth opens in the newest scheme, the built swatches draw the creature, and a click repaints every creature on the page. Page order: install, full growth, six schemes, What it is, three forms, specs. Version 0.3.0.
+
+**The gray was mine.** Light panels darkened every colour to about half, so the eyes would clear a 4.5:1 contrast rule against the body. That rule was never in the approved scheme (in the dark terminal the eyes sit near 1.2:1 against the lit top), and halving it crushed the ichor into tar. Now a creature always sits on the terminal's dark, the ground its schemes are drawn for: the site's creature panels are dark, and on a light terminal the plugin paints its own dark box behind it. The contrast test is gone; a test now checks that light and dark carry the same colours. Found by comparing a screenshot with the round-seven brief card, not by reading the code.
+
+**Also.** The plugin's state contract may augment only `'claude-code'`, so the `toBase64` typing moved into the module after `claude plugin validate` refused a global. Cuddly-apocalypse is now the round-five version, which stops at orange, so it changes colour for anyone already running it.
+
+**Next.** Shubby, then scarred-bones.

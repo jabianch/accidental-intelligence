@@ -1,7 +1,7 @@
 {
   "name": "apocalypse-mascots",
   "displayName": "Apocalypse Mascots",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Code with AI as it really is. A mascot above your prompt that grows with every capability you hand the agent.",
   "author": { "name": "Accidental Intelligence (an art project by Joseph Bianchi)", "url": "https://accidentalintelligence.org" },
   "homepage": "https://accidentalintelligence.org",
