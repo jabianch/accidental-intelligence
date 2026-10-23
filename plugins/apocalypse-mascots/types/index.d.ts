@@ -23,10 +23,3 @@ declare module 'claude-code' {
     }
   }
 }
-
-// The engine's runtime has it (its own Raster example uses it); TypeScript's lib does not yet.
-declare global {
-  interface Uint8Array {
-    toBase64(): string
-  }
-}

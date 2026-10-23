@@ -374,8 +374,11 @@ function rasterCells(ink: Ink[][], ground: number): string {
       words[i++] = ground
     }
   }
-  return new Uint8Array(words.buffer).toBase64()
+  return toBase64(new Uint8Array(words.buffer))
 }
+
+// The engine's runtime has Uint8Array#toBase64 (its own Raster example uses it); TypeScript's lib does not yet.
+const toBase64 = (bytes: Uint8Array): string => (bytes as Uint8Array & { toBase64(): string }).toBase64()
 
 type Run = { text: string; fg?: number; bold?: boolean }
 function runs(row: Ink[]): Run[] {
