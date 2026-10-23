@@ -80,21 +80,21 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
       .row{padding:28px 0;gap:20px}
       .viz{min-height:240px}
       .viz .q{font-size:110px}
-      .fullgrowth{margin-bottom:56px}
-      #why{padding-top:0}
+      #full{padding-top:0}
       .row .viz:has(.q){min-height:170px}
       .viz .badge{left:-8px;font-size:14px}
       .collect{margin-bottom:12px}
       .spec{grid-template-columns:1fr;gap:0}
       .spec dd{margin-bottom:10px}
     }
-    /* what it is */
-    .prose p{max-width:680px;font-size:17px;margin:0 0 22px}
-    #why{padding-top:24px}
-    .fullgrowth{max-width:880px;margin:0 auto 96px}
+    /* full growth */
+    #full{padding-top:24px}
+    .fullgrowth{max-width:880px;margin:0 auto}
     .fullgrowth .viz pre{font-size:clamp(14px,2.6vw,26px)}
     .fullgrowth .note{text-align:center;margin:12px auto 0;max-width:none;font-size:12px}
     .viz.tall{min-height:320px}
+    /* what it is */
+    .prose p{max-width:680px;font-size:17px;margin:0 0 22px}
     .side .note{margin-top:10px}
     .prose p.pitch{font-size:19px;font-weight:500}
     /* forms: alternating rows, no cards */
@@ -161,12 +161,15 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
     </div>
     <p class="flavor" data-k="flavor" set:html={inline(copy.flavor)}></p>
   </section>)
-  if (id === 'why') return (
-  <section data-section="why" id="why" class="prose">
+  if (id === 'full') return (
+  <section data-section="full" id="full">
     <div class="fullgrowth">
       <div class="viz tall"><pre id="viz-full" data-start={LATEST}></pre><span class="badge ok" data-k="fullBadge">{copy.fullBadge}</span></div>
       <p class="note" data-k="fullNote">{copy.fullNote}</p>
     </div>
+  </section>)
+  if (id === 'why') return (
+  <section data-section="why" id="why" class="prose">
     <h2 class="lab" data-k="whyTitle">{copy.whyTitle}</h2>
     <div>
       <p class="pitch" data-k="pitch" set:html={inline(copy.pitch)}></p>

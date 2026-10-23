@@ -1,8 +1,9 @@
 {
   "order": [
     "hero",
-    "why",
+    "full",
     "schemes",
+    "why",
     "forms",
     "specs"
   ],
