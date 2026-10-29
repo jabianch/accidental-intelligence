@@ -24,8 +24,8 @@ For any other agent below, put its name where `codex` is. The pane goes in a spl
 | Agent | `setup <agent> --write` adds | Then |
 |-------|------------------------------|------|
 | Codex CLI | four hooks to `~/.codex/hooks.json` | open `/hooks` in Codex and trust them; Codex runs no hook it has not been told to trust |
-| Gemini CLI | four hooks to `~/.gemini/settings.json` | |
 | Cursor, the editor and `cursor-agent` | four hooks to `~/.cursor/hooks.json` | |
+| Gemini CLI | four hooks to `~/.gemini/settings.json` | |
 | GitHub Copilot CLI | `~/.copilot/hooks/apocalypse-mascots.json` | |
 | OpenCode | a small plugin, `~/.config/opencode/plugins/apocalypse-mascots.js` | restart OpenCode |
 | Windsurf (Devin Desktop) | six hooks to `~/.codeium/windsurf/hooks.json` | |

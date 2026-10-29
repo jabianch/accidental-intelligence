@@ -162,16 +162,17 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
     <div class="installrow">
       <div class="harnesses" role="tablist">
         <button class="harness on" role="tab" aria-selected="true" data-tab="claude"><span class="prompt" aria-hidden="true">&gt;_</span><span data-k="harness">{copy.harness}</span></button>
+        {copy.agents.filter(a => copy.tabs.includes(a.id)).map(a => (<button class="harness" role="tab" aria-selected="false" data-tab={a.id}><span class="prompt" aria-hidden="true">&gt;_</span><span>{a.name}</span></button>))}
         <button class="harness" role="tab" aria-selected="false" data-tab="others"><span class="prompt" aria-hidden="true">&gt;_</span><span data-k="harnessOthers">{copy.harnessOthers}</span></button>
       </div>
       <div class="tabpane" data-pane="claude">
         <pre class="install"><code id="install-line" data-k="install">{copy.install}</code><button class="copy"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-k="installButton">{copy.installButton}</span></button></pre>
         <div class="note" data-k="installNote">{copy.installNote}</div>
       </div>
-      <div class="tabpane" data-pane="others" hidden>
-        <div class="agents">{copy.agents.map((a, i) => (<label><input type="radio" name="agent" value={a.id} checked={i === 0} /> <span data-k={`agents.${i}.name`}>{a.name}</span></label>))}</div>
-        <pre class="install"><code id="install-others">{copy.installOthers.replace('{agent}', copy.agents[0].id)}</code><button class="copy"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-k="installButton">{copy.installButton}</span></button></pre>
-        <div class="note"><span data-k="installOthersNote">{copy.installOthersNote}</span> <span id="agent-note">{copy.agents[0].note}</span> <span data-k="installOthersThen">{copy.installOthersThen}</span></div>
+      <div class="tabpane" data-pane="agent" hidden>
+        <div class="agents" hidden>{copy.agents.filter(a => !copy.tabs.includes(a.id)).map((a, i) => (<label><input type="radio" name="agent" value={a.id} checked={i === 0} /> <span>{a.name}</span></label>))}</div>
+        <pre class="install"><code id="install-others">{copy.installOthers.replace('{agent}', copy.tabs[0])}</code><button class="copy"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-k="installButton">{copy.installButton}</span></button></pre>
+        <div class="note"><span data-k="installOthersNote">{copy.installOthersNote}</span> <span id="agent-note"></span> <span data-k="installOthersThen">{copy.installOthersThen}</span></div>
       </div>
       <a class="srclink" href="https://github.com/jabianch/accidental-intelligence" data-k="sourceLink">{copy.sourceLink}</a>
     </div>

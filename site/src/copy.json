@@ -193,7 +193,7 @@
   "fullNote": "Yoggy at stage six: seeing eyes, grasping hands, your shell, the open web, your other apps, and more of itself.",
   "installCopied": "Copied ✓",
   "harness": "Claude Code",
-  "harnessOthers": "Codex, Gemini CLI, Cursor & the rest",
+  "harnessOthers": "The others",
   "installOthers": "npm install -g apocalypse-mascots\napocalypse-mascots setup {agent} --write",
   "installOthersNote": "The second line wires the agent’s hooks to the creature, watching only, and keeps a copy of the settings file as it was.",
   "agents": [
@@ -238,5 +238,9 @@
       "note": ""
     }
   ],
-  "installOthersThen": "Then run apocalypse-mascots in a terminal beside the agent: a split, a second tab, your editor’s terminal panel. Every other agent keeps its screen to itself, so the creature gets one of its own."
+  "installOthersThen": "Then run apocalypse-mascots in a terminal beside the agent: a split, a second tab, your editor’s terminal panel. Every other agent keeps its screen to itself, so the creature gets one of its own.",
+  "tabs": [
+    "codex",
+    "cursor"
+  ]
 }
