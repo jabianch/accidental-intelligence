@@ -105,3 +105,16 @@ Design reasoning, in order, the way Pippin Barr keeps it. Newest entry last. The
 **Also.** The plugin's state contract may augment only `'claude-code'`, so the `toBase64` typing moved into the module after `claude plugin validate` refused a global. Cuddly-apocalypse is now the round-five version, which stops at orange, so it changes colour for anyone already running it.
 
 **Next.** Shubby, then scarred-bones.
+
+## 2026-10-29 — Shubby, the second drop
+
+**Notes.** Port Shubby as round seven drew it: the organic form, cells first, in value roles; each scheme painted for its body; foetid-ichor its own; one pseudopod ending in a plain smiling face whose right half has grown back into flesh, in the scheme's brightest colour. Measure the band it actually gets.
+
+**Done.** Mods have no canvas, so `hooks/figures.ts` carries a small one: nonzero fills, round strokes, clips, alpha and the two composite modes the drawings use, sixteen samples a pixel, into a 32 × 16 pixel field at 2 × 2, folded into half-block cells as the brief folds them. The round-seven drawing and material painter are ported over it unchanged. `/mascot form shubby` draws it and opens it in foetid-ichor; it keeps real time on its own clock, an eighth of a second while it works and half a second between turns, so Yoggy's pace is untouched. The site draws the same cells from the same file, imported into the page, so the two cannot drift.
+
+**Checked against the brief, not by eye.** The brief's own canvas pipeline ran in a browser at fixed times and its cells were diffed against the port's: Shubby is identical in every scheme, cell for cell and colour for colour. At four samples a pixel the port lost Shoggy's sweat-drop star, which is thinner than a pixel; at sixteen it keeps it.
+
+**The band.** The engine gives `maxRows`: the terminal's height, or half of it in fullscreen, the prompt included. The figure wants eight rows; a shorter band keeps its hooves and loses its top. Hidden, it leaves its mask, as Yoggy does.
+
+**Next.** Scarred-bones, then strange-aeons, then Shoggy.
+

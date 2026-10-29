@@ -78,9 +78,10 @@ test('while a turn runs it holds the mask; hidden, only the mask remains', async
   await hidden.unmount()
 })
 
-test('/mascot form picks a form; the unbuilt ones say so and fall back', async $ => {
+test('/mascot form picks a form; the unbuilt ones say so', async $ => {
   const run = (args: string) => $.command.run({ command: 'mascot', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
-  expect((await run('form shubby')).text).toMatch(/coming soon to your region/)
+  expect((await run('form shoggy')).text).toMatch(/coming soon to your region/)
+  expect((await run('form shubby')).text).toBe('Shubby, in foetid-ichor.')
   expect((await run('form yoggy')).text).toBe('Yoggy.')
   expect((await run('form nothing')).text).toMatch(/Forms:/)
   expect((await run('scheme strange-aeons')).text).toMatch(/coming soon to your region/)
@@ -176,4 +177,69 @@ test('the hide button sits dim, so it does not ask to be pressed', async ($, on)
   expect(hide.props.dimColor).toBe(true)
   expect(hide.props.hotkey).toBeUndefined()
   await ui.unmount()
+})
+
+const HALF = /[▀▄]/
+const GROUND_DARK = 0x0d0b14
+
+test('Shubby is drawn in half-blocks, in foetid-ichor, its mask in the ichor\'s brightest', async ($, on) => {
+  await grown($, on)
+  const run = (args: string) => $.command.run({ command: 'mascot', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
+  await run('form shubby')
+  const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
+  const raster = (await ui.find({ type: 'Raster' })) as Extract<RenderElement, { type: 'Raster' }>
+  expect(raster.props.rows).toBe(8) // its whole field: a 12-row band less two caption lines and a spare
+  const cells = cellsOf(raster).filter(c => HALF.test(c.ch))
+  expect(cells.length).toBeGreaterThan(40) // at its first beat the branches have not grown in yet
+  expect(cellsOf(raster).some(c => BRAILLE.test(c.ch))).toBe(false) // not Yoggy's texture
+  const colours = cells.flatMap(c => [c.fg, c.bg]).filter(n => n !== 0x01000000).map(rgbOf)
+  const green = colours.filter(([r, g, b]) => g >= b && g >= r * 0.8)
+  expect(green.length).toBeGreaterThan(colours.length * 0.8)
+  expect(colours.some(([r, g, b]) => r > 180 && g > 190 && b < 150)).toBe(true) // the mask, in the ichor's brightest
+  await ui.unmount()
+  // off the terminal it is the same half-blocks as coloured text
+  const desk = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'desktop', ...WORKING })
+  expect(await desk.find({ type: 'Text', text: /[▀▄]/ })).toBeDefined()
+  await desk.unmount()
+})
+
+test('a short band keeps Shubby\'s feet and loses its top; hidden, the mask stays', async ($, on) => {
+  on('tool.call', { tool: 'Bash' }, () => ({ result: 'ok', text: 'ok' }))
+  await $.tool.call({ tool: 'Bash', command: 'true' })
+  const run = (args: string) => $.command.run({ command: 'mascot', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
+  await run('form shubby')
+  const tall = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
+  const full = cellsOf(await tall.find({ type: 'Raster' }))
+  await tall.unmount()
+  const short = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING, props: { ...WORKING.props, maxRows: 6 } })
+  const raster = (await short.find({ type: 'Raster' })) as Extract<RenderElement, { type: 'Raster' }>
+  expect(raster.props.rows).toBe(4)
+  const cut = cellsOf(raster), width = raster.props.columns
+  expect(cut.slice(-width).map(c => c.ch)).toEqual(full.slice(-width).map(c => c.ch)) // the hooves are the same row
+  await short.unmount()
+  await run('hide')
+  const hidden = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
+  expect(await hidden.find({ type: 'Text', text: /☺/ })).toBeDefined()
+  expect(await hidden.find({ type: 'Raster' })).toBeUndefined()
+  await hidden.unmount()
+})
+
+test('on a light terminal Shubby brings the same dark ground', async ($, on) => {
+  await grown($, on)
+  const run = (args: string) => $.command.run({ command: 'mascot', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 80 } })
+  await run('form shubby')
+  const drawn: Record<string, { ch: string; fg: number; bg: number }[]> = {}
+  for (const th of ['dark', 'light']) {
+    await run(`theme ${th}`)
+    const ui = await $.ui.mount({ plugin: 'apocalypse-mascots', surface: 'terminal', ...WORKING })
+    drawn[th] = cellsOf(await ui.find({ type: 'Raster' }))
+    await ui.unmount()
+  }
+  const dark = drawn.dark ?? [], light = drawn.light ?? []
+  for (const [i, c] of light.entries()) {
+    const d = dark[i]
+    expect(c.fg).toBe(d?.fg)
+    if (d?.bg === 0x01000000) expect(c.bg).toBe(GROUND_DARK) // only the empty halves change
+    else expect(c.bg).toBe(d?.bg)
+  }
 })

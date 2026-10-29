@@ -2,14 +2,16 @@ import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
 import type { Form, Reach, Scheme, Theme } from '../types'
+import { COLS, ROWS, drawShoggy, drawShubby, shoggyEyes, shubbyState } from './figures'
+import type { HalfCell, RGB } from './figures'
 
 // ---------------------------------------------------------------------------
 // Apocalypse Mascots, by Accidental Intelligence.
 // Code with AI as it really is.
 //
-// Three forms are promised: Yoggy (the iridescent mass), Shubby (the
-// anatomy), Shoggy (the chibi). Yoggy is built. The other two fall back to
-// Yoggy and say so. Six color schemes are promised; each drop opens one more.
+// Three forms: Yoggy (the iridescent mass), Shubby (the anatomy), Shoggy (the
+// chibi). Each drop opens one more form or one more color scheme; an unbuilt
+// one says so and leaves the creature as it was.
 // ---------------------------------------------------------------------------
 
 
@@ -20,8 +22,14 @@ const isHidden = atom({ plugin: 'apocalypse-mascots', key: 'isHidden' } as const
 const frame = atom({ plugin: 'apocalypse-mascots', key: 'frame' } as const, 0)
 const theme = atom({ plugin: 'apocalypse-mascots', key: 'theme' } as const, 'dark' as Theme)
 const scheme = atom({ plugin: 'apocalypse-mascots', key: 'scheme' } as const, 'cuddly-apocalypse' as Scheme)
+const form = atom({ plugin: 'apocalypse-mascots', key: 'form' } as const, 'yoggy' as Form)
+// the figures' own clock, in eighths of a second: they hold poses at eight drawings a second
+const beat = atom({ plugin: 'apocalypse-mascots', key: 'beat' } as const, 0)
 
 const FORMS: Form[] = ['yoggy', 'shubby', 'shoggy']
+const BUILT_FORMS = new Set<Form>(['yoggy', 'shubby'])
+// each form's own scheme, which it opens in
+const NATIVE: Record<Form, Scheme> = { yoggy: 'cuddly-apocalypse', shubby: 'foetid-ichor', shoggy: 'strange-aeons' }
 // in release order: each drop opens the next one's gate
 const SCHEMES: Scheme[] = ['cuddly-apocalypse', 'foetid-ichor', 'scarred-bones', 'strange-aeons', 'imitated-accents', 'cosmic-pulsing']
 const BUILT_SCHEMES = new Set<Scheme>(['cuddly-apocalypse', 'foetid-ichor'])
@@ -326,7 +334,7 @@ const FIELDS: Record<Scheme, Field> = {
 // terminal and as runs of Text everywhere else
 // ---------------------------------------------------------------------------
 
-type Ink = { ch: string; fg?: number; bold?: boolean } // fg is 0xRRGGBB; absent, the terminal's own
+type Ink = { ch: string; fg?: number; bg?: number; bold?: boolean } // colours are 0xRRGGBB; absent, the terminal's own (bg: the ground)
 
 // The schemes are drawn for a dark ground. On a light terminal the creature
 // brings its own: every cell it paints sits on the terminal dark of the site.
@@ -371,7 +379,7 @@ function rasterCells(ink: Ink[][], ground: number): string {
     for (const cell of row) {
       words[i++] = cell.ch.codePointAt(0) ?? 0x20
       words[i++] = cell.fg ?? DEFAULT_COLOR
-      words[i++] = ground
+      words[i++] = cell.bg ?? ground
     }
   }
   return toBase64(new Uint8Array(words.buffer))
@@ -380,15 +388,21 @@ function rasterCells(ink: Ink[][], ground: number): string {
 // The engine's runtime has Uint8Array#toBase64 (its own Raster example uses it); TypeScript's lib does not yet.
 const toBase64 = (bytes: Uint8Array): string => (bytes as Uint8Array & { toBase64(): string }).toBase64()
 
-type Run = { text: string; fg?: number; bold?: boolean }
+type Run = { text: string; fg?: number; bg?: number; bold?: boolean }
 function runs(row: Ink[]): Run[] {
   const out: Run[] = []
   for (const cell of row) {
     const last = out[out.length - 1]
-    if (last && last.fg === cell.fg && last.bold === cell.bold) last.text += cell.ch
-    else out.push({ text: cell.ch, fg: cell.fg, bold: cell.bold })
+    if (last && last.fg === cell.fg && last.bg === cell.bg && last.bold === cell.bold) last.text += cell.ch
+    else out.push({ text: cell.ch, fg: cell.fg, bg: cell.bg, bold: cell.bold })
   }
   return out
+}
+
+// a figure's half-block cells as ink: one blank column on the left, as Yoggy has
+const rgbInt = (c: RGB | undefined) => (c ? (c[0] << 16) | (c[1] << 8) | c[2] : undefined)
+function figureInk(cells: HalfCell[][]): Ink[][] {
+  return cells.map(row => [{ ch: ' ' }, ...row.map(c => ({ ch: c.ch, fg: rgbInt(c.fg), bg: rgbInt(c.bg) }))])
 }
 
 // ---------------------------------------------------------------------------
@@ -413,6 +427,8 @@ const HELP = `/mascot hide · /mascot show · /mascot form yoggy|shubby|shoggy �
 export const register: Register = on => {
   let seed = 1
   let isWorking = false
+  let figure: Form = 'yoggy'
+  const shubby = shubbyState()
 
   on('session.start', async ($, e, next) => {
     await $.command.register({
@@ -428,6 +444,15 @@ export const register: Register = on => {
         void update($, frame, n => (n + 1) % 1000000)
       }
     })
+    // a figure keeps real time: every eighth of a second while it works, twice a second between turns
+    figure = await read($, form)
+    let figureBeat = 0
+    $.clock.every(125, () => {
+      if (figure === 'yoggy') return
+      figureBeat++
+      if (isWorking) void update($, beat, n => (n + 1) % 100000000)
+      else if (figureBeat % 4 === 0) void update($, beat, n => (n + 4) % 100000000)
+    })
     return next(e)
   })
 
@@ -437,9 +462,15 @@ export const register: Register = on => {
       case 'hide': await update($, isHidden, () => true); return { text: 'It is still there. You just cannot see it.' }
       case 'show': await update($, isHidden, () => false); return { text: 'It is back.' }
       case 'form': {
-        if (!FORMS.includes(arg as Form)) return { text: `Forms: ${FORMS.join(', ')}.` }
-        if (arg !== 'yoggy') return { text: `${cap(arg)} is coming soon to your region.` }
-        return { text: 'Yoggy.' }
+        const id = FORMS.find(f => f === arg)
+        if (!id) return { text: `Forms: ${FORMS.join(', ')}.` }
+        if (!BUILT_FORMS.has(id)) return { text: `${cap(id)} is coming soon to your region.` }
+        // a form opens in its own scheme, while that scheme is out
+        const own = NATIVE[id]
+        await update($, form, () => id)
+        figure = id
+        if (BUILT_SCHEMES.has(own)) await update($, scheme, () => own)
+        return { text: id === 'yoggy' ? 'Yoggy.' : `${cap(id)}, in ${own}.` }
       }
       case 'scheme': {
         const id = SCHEMES.find(s => s === arg)
@@ -499,12 +530,32 @@ export const register: Register = on => {
 
     const th = await read($, theme)
     const dark = th === 'dark'
-    const field = FIELDS[await read($, scheme)]
+    const id = await read($, scheme)
+    const field = FIELDS[id]
     const tick = await read($, frame)
+    const shape = await read($, form)
+    const t = (await read($, beat)) / 8
+    const ground = dark ? DEFAULT_COLOR : GROUND
+    const r = await read($, reach)
+    const stage = stageOf(r)
+
+    // the terminal takes the cells whole; other surfaces get the same cells as coloured runs
+    const draw = (ink: Ink[][], key: string) => e.surface === 'terminal'
+      ? (() => {
+          const { Raster } = $.ui.resolve({ ...e, surface: 'terminal' as const })
+          return <Raster key={key} columns={ink[0]?.length ?? 1} rows={ink.length} cells={rasterCells(ink, ground)} />
+        })()
+      : ink.map((row, i) => (
+          <Box key={`r${i}`}>
+            {runs(row).map((run, j) => <Text key={`s${j}`} color={run.fg === undefined ? undefined : hexOf(run.fg)} backgroundColor={run.bg !== undefined ? hexOf(run.bg) : dark ? undefined : hexOf(GROUND)} bold={run.bold}>{run.text}</Text>)}
+          </Box>
+        ))
 
     // hidden: the mask stays. it is still there.
     if (hidden) {
       if (!awake) return next(e)
+      // Shoggy is the mask, so what stays is its two cute eyes
+      if (shape === 'shoggy') return <Box>{draw(figureInk(shoggyEyes(id, t, stage)), 'eyes')}</Box>
       return (
         <Box>
           <Text color={hexOf(maskInk(field, tick))} backgroundColor={dark ? undefined : hexOf(GROUND)} bold>☺</Text>
@@ -513,25 +564,19 @@ export const register: Register = on => {
       )
     }
 
-    const r = await read($, reach)
-    const stage = stageOf(r)
-
     const lines = captionLines(r, e.props.bodyColumns)
-    const rows = Math.max(2, Math.min(2 + Math.floor(stage / 2), e.props.maxRows - 1 - lines.length, 5))
-    const width = Math.max(8, Math.min(e.props.bodyColumns - 3, 8 + stage * 2))
-    const ink = paintYoggy(yoggy(stage, width, rows, tick, awake), field, tick, awake)
-
-    // the terminal takes the cells whole; other surfaces get the same cells as coloured runs
-    const body = e.surface === 'terminal'
-      ? (() => {
-          const { Raster } = $.ui.resolve({ ...e, surface: 'terminal' as const })
-          return <Raster key="yoggy" columns={ink[0]?.length ?? 1} rows={ink.length} cells={rasterCells(ink, dark ? DEFAULT_COLOR : GROUND)} />
-        })()
-      : ink.map((row, i) => (
-          <Box key={`r${i}`}>
-            {runs(row).map((run, j) => <Text key={`s${j}`} color={run.fg === undefined ? undefined : hexOf(run.fg)} backgroundColor={dark ? undefined : hexOf(GROUND)} bold={run.bold}>{run.text}</Text>)}
-          </Box>
-        ))
+    let ink: Ink[][]
+    if (shape === 'yoggy') {
+      const rows = Math.max(2, Math.min(2 + Math.floor(stage / 2), e.props.maxRows - 1 - lines.length, 5))
+      const width = Math.max(8, Math.min(e.props.bodyColumns - 3, 8 + stage * 2))
+      ink = paintYoggy(yoggy(stage, width, rows, tick, awake), field, tick, awake)
+    } else {
+      // a figure is drawn whole in its 32 × 8 field; a short band keeps its feet and loses its top
+      const cells = shape === 'shubby' ? drawShubby(id, shubby, t, stage, awake) : drawShoggy(id, t, stage, awake)
+      const rows = Math.max(2, Math.min(ROWS, e.props.maxRows - 1 - lines.length))
+      ink = figureInk(cells.slice(ROWS - rows)).map(row => row.slice(0, Math.max(8, Math.min(COLS + 1, e.props.bodyColumns - 1))))
+    }
+    const body = draw(ink, shape)
 
     return (
       <Box flexDirection="column">

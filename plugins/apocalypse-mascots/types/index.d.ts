@@ -20,6 +20,8 @@ declare module 'claude-code' {
       frame: number
       theme: Theme
       scheme: Scheme
+      form: Form
+      beat: number
     }
   }
 }

@@ -23,10 +23,11 @@
   refresh();
   // the forms: Yoggy on a light panel, big, awake
   const v=document.getElementById('viz-yoggy'),vf=document.getElementById('viz-full');
-  document.querySelectorAll('[data-form]').forEach(b=>b.addEventListener('click',()=>{toast(b.dataset.form==='yoggy'?'Yoggy.':b.dataset.soon)}));
+  document.querySelectorAll('[data-form]').forEach(b=>b.addEventListener('click',()=>{const f=b.dataset.form;toast(b.dataset.soon||f.charAt(0).toUpperCase()+f.slice(1)+'.')}));
   // the schemes: a built one repaints every creature on the page; the rest are coming soon
   const creatures=[term,v&&C.mount(v,{stage:4,awake:true,widthFor:()=>18,rowsFor:()=>6}),vf&&C.mount(vf,{stage:6,awake:true,scheme:vf.dataset.start,widthFor:()=>22,rowsFor:()=>7})].filter(Boolean);
+  window.Mascots={creatures}; // the figures (src/figures.ts) join once their module loads
   document.querySelectorAll('[data-swatch]').forEach(el=>C.swatch(el,el.dataset.swatch));
-  document.querySelectorAll('[data-scheme]').forEach(s=>s.addEventListener('click',()=>{const x=s.dataset.scheme;if(s.classList.contains('soon')){toast(x+' is coming soon to your region.');return}creatures.forEach(c=>c.setScheme(x));document.querySelectorAll('[data-scheme]').forEach(o=>o.classList.toggle('on',o===s));toast(x+'.')}));
+  document.querySelectorAll('[data-scheme]').forEach(s=>s.addEventListener('click',()=>{const x=s.dataset.scheme;if(s.classList.contains('soon')){toast(x+' is coming soon to your region.');return}window.Mascots.scheme=x;creatures.forEach(c=>c.setScheme(x));document.querySelectorAll('[data-scheme]').forEach(o=>o.classList.toggle('on',o===s));toast(x+'.')}));
   const line=document.querySelector('pre.install'),cbtn=document.getElementById('copy');line.addEventListener('click',async()=>{if(document.body.classList.contains('editing'))return;try{await navigator.clipboard.writeText(document.getElementById('install-line').textContent.trim());line.classList.add('done');const lab=cbtn.querySelector('span'),was=lab.textContent;lab.textContent=CP.installCopied;toast('Copied. It is on your clipboard now.');setTimeout(()=>{line.classList.remove('done');lab.textContent=was},2200)}catch{toast('Select the line and copy it.')}});
 })();
