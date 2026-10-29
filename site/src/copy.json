@@ -192,6 +192,51 @@
   "fullBadge": "FULL GROWTH",
   "fullNote": "Yoggy at stage six: seeing eyes, grasping hands, your shell, the open web, your other apps, and more of itself.",
   "installCopied": "Copied ✓",
-  "harness": "Claude Code only",
-  "harnessSub": "Other harnesses: coming soon to your region."
+  "harness": "Claude Code",
+  "harnessOthers": "Codex, Gemini CLI, Cursor & the rest",
+  "installOthers": "npm install -g apocalypse-mascots\napocalypse-mascots setup {agent} --write",
+  "installOthersNote": "The second line wires the agent’s hooks to the creature, watching only, and keeps a copy of the settings file as it was.",
+  "agents": [
+    {
+      "id": "codex",
+      "name": "Codex",
+      "note": "In Codex, open /hooks and trust the four apocalypse-mascots hooks. Codex runs no hook until you do."
+    },
+    {
+      "id": "gemini",
+      "name": "Gemini CLI",
+      "note": ""
+    },
+    {
+      "id": "cursor",
+      "name": "Cursor",
+      "note": "The editor and cursor-agent both."
+    },
+    {
+      "id": "copilot",
+      "name": "Copilot CLI",
+      "note": ""
+    },
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "note": "For OpenCode it writes a small plugin instead; then restart OpenCode."
+    },
+    {
+      "id": "windsurf",
+      "name": "Windsurf",
+      "note": ""
+    },
+    {
+      "id": "qwen",
+      "name": "Qwen Code",
+      "note": ""
+    },
+    {
+      "id": "factory",
+      "name": "Factory Droid",
+      "note": ""
+    }
+  ],
+  "installOthersThen": "Then run apocalypse-mascots in a terminal beside the agent: a split, a second tab, your editor’s terminal panel. Every other agent keeps its screen to itself, so the creature gets one of its own."
 }

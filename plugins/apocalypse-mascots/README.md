@@ -44,7 +44,7 @@ cuddly-apocalypse (built) · foetid-ichor (built) · scarred-bones · strange-ae
 
 ## What it never does
 
-No network calls, no storage outside the session, no change to your settings, no reading of your prompts or the model's answers. It counts tool calls by name and draws. Read `hooks/register.tsx`; it is one file.
+No network calls, no storage outside the session, no change to your settings, no reading of your prompts or the model's answers. It counts tool calls by name and draws. Read `hooks/`: three files, `register.tsx` for the band, `mascot.ts` for the creature, `figures.ts` for the drawn forms.
 
 ## How it is built
 

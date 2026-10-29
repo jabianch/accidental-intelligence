@@ -56,9 +56,14 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
     pre.install:hover{transform:translateY(-2px);border-color:var(--ink);box-shadow:0 4px 0 var(--ink),0 16px 28px rgba(27,27,27,.14)}
     pre.install:active{transform:translateY(1px);box-shadow:0 1px 0 var(--ink)}
     pre.install.done{border-color:#2d6a4f;box-shadow:0 4px 0 #2d6a4f,0 16px 28px rgba(45,106,79,.18)}
-    .harness{display:inline-flex;align-items:center;gap:10px;margin:0 0 12px;padding:7px 12px 7px 8px;background:var(--term);color:var(--term-fg);border-radius:3px;font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-    .harness .prompt{color:#c9b8ff;letter-spacing:0}
-    .harness em{font-style:normal;color:var(--term-mute);letter-spacing:.04em;text-transform:none}
+    .harnesses{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+    .harness{display:inline-flex;align-items:center;gap:10px;padding:7px 12px 7px 8px;background:transparent;color:var(--ink2);border:1px solid var(--line);border-radius:3px;font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+    .harness:hover{border-color:var(--ink);color:var(--ink)}
+    .harness.on{background:var(--term);color:var(--term-fg);border-color:var(--term)}
+    .harness .prompt{color:var(--ink3);letter-spacing:0}.harness.on .prompt{color:#c9b8ff}
+    .agents{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 12px;font:13px var(--mono);color:var(--ink2)}
+    .agents label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+    .note code{font:12px var(--mono);background:var(--panel);padding:1px 4px;border-radius:2px}
     pre.install code{flex:1}
     pre.install button{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:500 13px var(--sans);background:var(--ink);color:#fff;border:0;border-radius:2px;padding:9px 14px;cursor:pointer;white-space:nowrap;transition:background .2s,transform .1s}
     pre.install:hover button{background:var(--red)}
@@ -72,9 +77,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
       .term .bar{margin-bottom:10px}
       .give{justify-content:flex-start;gap:6px 14px;margin-top:36px}
       .give .lead{flex-basis:100%}
-      .harness{flex-wrap:wrap;row-gap:6px}
-      .harness span{white-space:nowrap}
-      .harness em{flex-basis:100%;line-height:1.4}
+      .harness{letter-spacing:.08em}
       pre.install{flex-direction:column;align-items:stretch;font-size:13px;word-break:normal;overflow-wrap:anywhere}
       pre.install button{padding:11px 14px}
       .flavor{margin-top:56px;font-size:17px}
@@ -157,9 +160,19 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
       <button id="hide">hide</button>
     </div>
     <div class="installrow">
-      <div class="harness"><span class="prompt" aria-hidden="true">&gt;_</span><span data-k="harness">{copy.harness}</span><em data-k="harnessSub">{copy.harnessSub}</em></div>
-      <pre class="install"><code id="install-line" data-k="install">{copy.install}</code><button id="copy"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-k="installButton">{copy.installButton}</span></button></pre>
-      <div class="note" data-k="installNote">{copy.installNote}</div>
+      <div class="harnesses" role="tablist">
+        <button class="harness on" role="tab" aria-selected="true" data-tab="claude"><span class="prompt" aria-hidden="true">&gt;_</span><span data-k="harness">{copy.harness}</span></button>
+        <button class="harness" role="tab" aria-selected="false" data-tab="others"><span class="prompt" aria-hidden="true">&gt;_</span><span data-k="harnessOthers">{copy.harnessOthers}</span></button>
+      </div>
+      <div class="tabpane" data-pane="claude">
+        <pre class="install"><code id="install-line" data-k="install">{copy.install}</code><button class="copy"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-k="installButton">{copy.installButton}</span></button></pre>
+        <div class="note" data-k="installNote">{copy.installNote}</div>
+      </div>
+      <div class="tabpane" data-pane="others" hidden>
+        <div class="agents">{copy.agents.map((a, i) => (<label><input type="radio" name="agent" value={a.id} checked={i === 0} /> <span data-k={`agents.${i}.name`}>{a.name}</span></label>))}</div>
+        <pre class="install"><code id="install-others">{copy.installOthers.replace('{agent}', copy.agents[0].id)}</code><button class="copy"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-k="installButton">{copy.installButton}</span></button></pre>
+        <div class="note"><span data-k="installOthersNote">{copy.installOthersNote}</span> <span id="agent-note">{copy.agents[0].note}</span> <span data-k="installOthersThen">{copy.installOthersThen}</span></div>
+      </div>
       <a class="srclink" href="https://github.com/jabianch/accidental-intelligence" data-k="sourceLink">{copy.sourceLink}</a>
     </div>
     <p class="flavor" data-k="flavor" set:html={inline(copy.flavor)}></p>

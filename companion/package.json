@@ -2,7 +2,24 @@
   "name": "apocalypse-mascots",
   "version": "0.7.0",
   "description": "Code with AI as it really is. A mascot in a pane beside your coding agent that grows with every capability you hand it. Codex, Gemini CLI, Cursor, Copilot, OpenCode and more.",
+  "keywords": [
+    "codex",
+    "gemini-cli",
+    "cursor",
+    "copilot",
+    "opencode",
+    "claude-code",
+    "ai-agents",
+    "hooks",
+    "terminal",
+    "mascot",
+    "tui",
+    "lovecraft"
+  ],
   "homepage": "https://accidentalintelligence.org/mascots/",
+  "bugs": {
+    "url": "https://github.com/jabianch/accidental-intelligence/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jabianch/accidental-intelligence.git",

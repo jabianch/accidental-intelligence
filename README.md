@@ -16,6 +16,8 @@ A non-profit, for now. An art project by Joseph Bianchi, Amsterdam. https://acci
 
 ## Install
 
+### Claude Code
+
 From a terminal session of Claude Code:
 
 ```
@@ -23,3 +25,12 @@ From a terminal session of Claude Code:
 ```
 
 Answer `y` to add the marketplace, then pick the user scope.
+
+### Codex, Gemini CLI, Cursor, Copilot, OpenCode, Windsurf, Qwen Code, Factory Droid
+
+```
+npm install -g apocalypse-mascots
+apocalypse-mascots setup codex --write
+```
+
+Put your agent's name where `codex` is. In Codex, also open `/hooks` and trust the four hooks: Codex runs no hook until you do. Run `apocalypse-mascots` in a terminal beside the agent; the creature lives in that pane. Details: [companion/](companion/).

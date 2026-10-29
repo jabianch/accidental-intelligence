@@ -3,8 +3,8 @@ by Joseph Bianchi (Accidental Intelligence), Amsterdam.
 
 Two licenses apply:
 
-1. CODE — everything under hooks/, types/, the test files, the manifests and the
-   build configuration — is released under the MIT License (below).
+1. CODE — everything under hooks/, types/, companion/src/, the test files, the
+   manifests and the build configuration — is released under the MIT License (below).
 
 2. ART AND COPY — the creature designs, their names (Yoggy, Shubby, Shoggy), the
    color schemes, the toasts, the spinner words, the manifesto, the READMEs and
