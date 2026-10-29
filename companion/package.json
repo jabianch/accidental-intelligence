@@ -1,6 +1,6 @@
 {
   "name": "apocalypse-mascots",
-  "version": "0.7.0",
+  "version": "0.4.0",
   "description": "Code with AI as it really is. A mascot in a pane beside your coding agent that grows with every capability you hand it. Codex, Gemini CLI, Cursor, Copilot, OpenCode and more.",
   "keywords": [
     "codex",
