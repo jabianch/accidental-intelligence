@@ -1,0 +1,36 @@
+{
+  "name": "apocalypse-mascots",
+  "version": "0.7.0",
+  "description": "Code with AI as it really is. A mascot in a pane beside your coding agent that grows with every capability you hand it. Codex, Gemini CLI, Cursor, Copilot, OpenCode and more.",
+  "homepage": "https://accidentalintelligence.org/mascots/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jabianch/accidental-intelligence.git",
+    "directory": "companion"
+  },
+  "author": "Accidental Intelligence (an art project by Joseph Bianchi)",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "bin": {
+    "apocalypse-mascots": "dist/apocalypse-mascots.mjs"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "esbuild src/cli.ts --bundle --platform=node --format=esm --target=node18 --banner:js='#!/usr/bin/env node' --outfile=dist/apocalypse-mascots.mjs",
+    "check": "tsc --noEmit -p .",
+    "test": "npm run build && node --test test/companion.test.mjs",
+    "prepack": "npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.6.3"
+  }
+}
