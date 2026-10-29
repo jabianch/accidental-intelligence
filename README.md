@@ -8,7 +8,7 @@ A non-profit, for now. An art project by Joseph Bianchi, Amsterdam. https://acci
 
 | # | Object | Status |
 |---|--------|--------|
-| 1 | [Apocalypse Mascots](plugins/apocalypse-mascots/) — Code with AI as it really is. | available |
+| 1 | [Apocalypse Mascots](https://github.com/jabianch/apocalypse-mascots) — Code with AI as it really is. | available |
 
 ## The site
 
@@ -33,4 +33,4 @@ npm install -g apocalypse-mascots
 apocalypse-mascots setup codex --write
 ```
 
-Put your agent's name where `codex` is. In Codex, also open `/hooks` and trust the four hooks: Codex runs no hook until you do. Run `apocalypse-mascots` in a terminal beside the agent; the creature lives in that pane. Details: [companion/](companion/).
+Put your agent's name where `codex` is. In Codex, also open `/hooks` and trust the four hooks: Codex runs no hook until you do. Run `apocalypse-mascots` in a terminal beside the agent; the creature lives in that pane. Details: [jabianch/apocalypse-mascots](https://github.com/jabianch/apocalypse-mascots/tree/main/companion).

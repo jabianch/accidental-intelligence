@@ -1,9 +1,9 @@
-// The figures on the page: Shubby and Shoggy, drawn by the plugin's own code (hooks/figures.ts), so
-// the site and the terminal cannot drift apart. Each <pre data-figure> gets one, awake, at stage four;
+// The figures on the page: Shubby and Shoggy, drawn by the plugin's own code (hooks/figures.ts, copied into vendor/ from jabianch/apocalypse-mascots by scripts/vendor-mascots.sh), so
+// the site and the terminal draw the same cells. Each <pre data-figure> gets one, awake, at stage four;
 // a scheme swatch repaints it through window.Mascots, as it does Yoggy.
-import { drawShoggy, drawShubby, shubbyState } from '../../plugins/apocalypse-mascots/hooks/figures'
-import type { HalfCell, RGB } from '../../plugins/apocalypse-mascots/hooks/figures'
-import type { Scheme } from '../../plugins/apocalypse-mascots/types'
+import { drawShoggy, drawShubby, shubbyState } from './vendor/apocalypse-mascots/hooks/figures'
+import type { HalfCell, RGB } from './vendor/apocalypse-mascots/hooks/figures'
+import type { Scheme } from './vendor/apocalypse-mascots/types'
 
 const css = (c: RGB) => `rgb(${c[0]},${c[1]},${c[2]})`
 function html(cells: HalfCell[][]): string {

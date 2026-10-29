@@ -1,4 +1,4 @@
-// The creature, ported from plugins/apocalypse-mascots/hooks/register.tsx. Constants identical.
+// The creature, ported from jabianch/apocalypse-mascots, plugins/apocalypse-mascots/hooks/register.tsx. Constants identical.
 // window.Creature.mount(el, { stage, awake, scheme }) → instance { setStage, setAwake, setHidden, setScheme }
 // window.Creature.swatch(el, scheme) draws a scheme on a plain body, in half-block pixels.
 (function () {

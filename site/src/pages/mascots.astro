@@ -12,7 +12,7 @@ const NATIVE = { shubby: 'foetid-ichor', shoggy: 'strange-aeons' }
 const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a = (Math.PI * i) / n - Math.PI / 2; const r = i % 2 ? r2 : r1; return `${(c + r * Math.cos(a)).toFixed(1)},${(c + r * Math.sin(a)).toFixed(1)}` }).join(' ')
 ---
 <Base title={`Apocalypse Mascots — ${copy.lab}`} description={`${copy.headline} Apocalypse Mascots, by ${copy.lab}.`}>
-  <Fragment slot="nav"><a href="/">Products</a><a href="#why">What it is</a><a href="#forms">Forms</a><a href="#specs">Specs</a><a href="https://github.com/jabianch/accidental-intelligence">Source</a></Fragment>
+  <Fragment slot="nav"><a href="/">Products</a><a href="#why">What it is</a><a href="#forms">Forms</a><a href="#specs">Specs</a><a href="https://github.com/jabianch/apocalypse-mascots">Source</a></Fragment>
   <style is:global>
     .titlewrap{position:relative;display:inline-block;margin:0 0 calc(min(270px,36vw)*.45)}
     h1.title{font:400 clamp(2rem,9.2vw,5rem)/1 var(--loud);letter-spacing:.01em;margin:0;display:inline-block;position:relative;white-space:nowrap}
@@ -174,7 +174,7 @@ const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a
         <pre class="install"><code id="install-others">{copy.installOthers.replace('{agent}', copy.tabs[0])}</code><button class="copy"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-k="installButton">{copy.installButton}</span></button></pre>
         <div class="note"><span data-k="installOthersNote">{copy.installOthersNote}</span> <span id="agent-note"></span> <span data-k="installOthersThen">{copy.installOthersThen}</span></div>
       </div>
-      <a class="srclink" href="https://github.com/jabianch/accidental-intelligence" data-k="sourceLink">{copy.sourceLink}</a>
+      <a class="srclink" href="https://github.com/jabianch/apocalypse-mascots" data-k="sourceLink">{copy.sourceLink}</a>
     </div>
     <p class="flavor" data-k="flavor" set:html={inline(copy.flavor)}></p>
   </section>)
