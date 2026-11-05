@@ -147,7 +147,7 @@
     ],
     [
       "Data stored",
-      "0 in Claude Code · a week of tool names in the pane"
+      "0"
     ],
     [
       "Mascot says",
@@ -194,13 +194,13 @@
   "installCopied": "Copied ✓",
   "harness": "Claude Code",
   "harnessOthers": "The others",
-  "installOthers": "npm install -g apocalypse-mascots\napocalypse-mascots setup {agent} --write",
-  "installOthersNote": "The second line wires the agent’s hooks to the creature, watching only, and keeps a copy of the settings file as it was.",
+  "installOthers": "Coming soon to your region.",
+  "installOthersNote": "",
   "agents": [
     {
       "id": "codex",
       "name": "Codex",
-      "note": "In Codex, open /hooks and trust the four apocalypse-mascots hooks. Codex skips new hooks until you do."
+      "note": ""
     },
     {
       "id": "gemini",
@@ -210,7 +210,7 @@
     {
       "id": "cursor",
       "name": "Cursor",
-      "note": "The editor and cursor-agent both."
+      "note": ""
     },
     {
       "id": "copilot",
@@ -220,7 +220,7 @@
     {
       "id": "opencode",
       "name": "OpenCode",
-      "note": "For OpenCode it writes a small plugin instead; then restart OpenCode."
+      "note": ""
     },
     {
       "id": "windsurf",
@@ -238,7 +238,7 @@
       "note": ""
     }
   ],
-  "installOthersThen": "Then run apocalypse-mascots in a terminal beside the agent: a split, a second tab, your editor’s terminal panel. Every other agent keeps its screen to itself, so the creature gets one of its own.",
+  "installOthersThen": "",
   "tabs": [
     "codex",
     "cursor"
