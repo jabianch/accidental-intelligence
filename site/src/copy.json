@@ -107,7 +107,7 @@
       "name": "Shubby",
       "god": "Shub-Niggurath",
       "line": "“The Black Goat of the Woods with a Thousand Young”",
-      "desc": "Shub-Niggurath. The anatomy: eyes on stalks, maws, the layered cross-section the doomers drew in 2023.",
+      "desc": "Shub-Niggurath. A goat skull on a ribcage on three cloven hooves, with red eyes, and branches that end in eyes and mouths. One ends in a plain smiling face, half grown back into flesh.",
       "status": "available",
       "badge": "AVAILABLE NOW!"
     },
@@ -147,7 +147,7 @@
     ],
     [
       "Data stored",
-      "0"
+      "0 in Claude Code · a week of tool names in the pane"
     ],
     [
       "Mascot says",
@@ -195,12 +195,12 @@
   "harness": "Claude Code",
   "harnessOthers": "The others",
   "installOthers": "npm install -g apocalypse-mascots\napocalypse-mascots setup {agent} --write",
-  "installOthersNote": "The second line wires the agent’s hooks to the creature, watching only, and keeps a copy of the settings file as it was.",
+  "installOthersNote": "The second line wires the agent’s hooks to the creature, watching only, and keeps a copy of the settings file as it was. The pane is new: its hooks are written from each agent’s docs and have not been run against the real agents yet, so tell me what breaks.",
   "agents": [
     {
       "id": "codex",
       "name": "Codex",
-      "note": "In Codex, open /hooks and trust the four apocalypse-mascots hooks. Codex runs no hook until you do."
+      "note": "In Codex, open /hooks and trust the four apocalypse-mascots hooks. Codex skips new hooks until you do."
     },
     {
       "id": "gemini",
