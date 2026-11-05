@@ -98,7 +98,7 @@
       "name": "Yoggy",
       "god": "Yog-Sothoth",
       "line": "“only a congeries of iridescent globes”",
-      "desc": "Yog-Sothoth, as written. A black iridescent mass, bubble-surfaced, faintly self-luminous, with temporary eyes forming and unforming. No tentacles. No mouth.",
+      "desc": "After Yog-Sothoth, with the rest borrowed from the shoggoth: a black iridescent mass, bubble-surfaced, faintly self-luminous, with temporary eyes forming and unforming. No tentacles. No mouth.",
       "status": "available",
       "badge": "AVAILABLE NOW!"
     },
@@ -195,7 +195,7 @@
   "harness": "Claude Code",
   "harnessOthers": "The others",
   "installOthers": "npm install -g apocalypse-mascots\napocalypse-mascots setup {agent} --write",
-  "installOthersNote": "The second line wires the agent’s hooks to the creature, watching only, and keeps a copy of the settings file as it was. The pane is new: its hooks are written from each agent’s docs and have not been run against the real agents yet, so tell me what breaks.",
+  "installOthersNote": "The second line wires the agent’s hooks to the creature, watching only, and keeps a copy of the settings file as it was.",
   "agents": [
     {
       "id": "codex",
