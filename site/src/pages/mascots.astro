@@ -12,7 +12,7 @@ const NATIVE = { shubby: 'foetid-ichor', shoggy: 'strange-aeons' }
 const seal = (n, r1, r2, c) => Array.from({ length: n * 2 }, (_, i) => { const a = (Math.PI * i) / n - Math.PI / 2; const r = i % 2 ? r2 : r1; return `${(c + r * Math.cos(a)).toFixed(1)},${(c + r * Math.sin(a)).toFixed(1)}` }).join(' ')
 ---
 <Base title={`Apocalypse Mascots — ${copy.lab}`} description={`${copy.headline} Apocalypse Mascots, by ${copy.lab}.`}>
-  <Fragment slot="nav"><a href="/">Products</a><a href="#why">What it is</a><a href="#forms">Forms</a><a href="#specs">Specs</a><a href="https://github.com/jabianch/apocalypse-mascots">Source</a></Fragment>
+  <Fragment slot="nav"><a href="/">Products</a><a href="#why">What it is</a><a href="#forms">Forms</a><a href="#specs">Specs</a><a href="https://github.com/jabianch/apocalypse-mascots">Source</a><a href="https://www.producthunt.com/products/apocalypse-mascots">Product Hunt</a></Fragment>
   <style is:global>
     .titlewrap{position:relative;display:inline-block;margin:0 0 calc(min(270px,36vw)*.45)}
     h1.title{font:400 clamp(2rem,9.2vw,5rem)/1 var(--loud);letter-spacing:.01em;margin:0;display:inline-block;position:relative;white-space:nowrap}
